@@ -2,6 +2,5 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test_project/LayoutBuilder.dart';
 
 void main() {
-
-  runApp(const MyLayout());
+  runApp(const MaterialApp(home: MyLayout()));
 }
