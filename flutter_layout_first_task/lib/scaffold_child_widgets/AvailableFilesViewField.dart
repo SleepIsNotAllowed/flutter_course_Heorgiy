@@ -73,6 +73,7 @@ class AvailableFilesViewField extends StatelessWidget {
         ),
         Text(
           " Changed: " + textInfo,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
