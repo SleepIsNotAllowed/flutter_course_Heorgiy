@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_layout_first_task/scaffold_bottomNavBar_widgets/BottomBar.dart';
-import 'package:flutter_layout_first_task/scaffold_child_widgets/AvailableFilesViewField.dart';
-import 'package:flutter_layout_first_task/scaffold_child_widgets/SearchBar.dart';
-import 'package:flutter_layout_first_task/scaffold_child_widgets/StorageVariantsBar.dart';
+import 'package:flutter_layout_first_task/scaffold_bottom_nav_bar_widgets/bottom_bar.dart';
+import 'package:flutter_layout_first_task/scaffold_child_widgets/available_files_view_field.dart';
+import 'package:flutter_layout_first_task/scaffold_child_widgets/search_bar.dart';
+import 'package:flutter_layout_first_task/scaffold_child_widgets/storage_variants_bar.dart';
 
 class MyLayout extends StatelessWidget {
   const MyLayout({Key? key}) : super(key: key);
