@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop_flutter_course/shop_home_page/bottom_navigation_bar/bottom_Button.dart';
 
-class BottomBar extends StatelessWidget {
-  BottomBar({Key? key}) : super(key: key);
+class BottomBar extends StatefulWidget {
+  const BottomBar({Key? key}) : super(key: key);
 
+  @override
+  State<BottomBar> createState() => _BottomBarState();
+}
+
+class _BottomBarState extends State<BottomBar> {
   BottomButtonState? selectedButton;
 
   @override

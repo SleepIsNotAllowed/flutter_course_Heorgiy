@@ -15,9 +15,9 @@ class _TopSearchBarState extends State<TopSearchBar> {
     return Container(
       height: 60,
       color: Colors.transparent,
-      padding: const EdgeInsets.fromLTRB(15, 15, 10, 5),
+      padding: const EdgeInsets.fromLTRB(15, 15, 5, 5),
       child: Row(
-        children: [
+        children: const [
           Expanded(
             child: SearchField(),
           ),

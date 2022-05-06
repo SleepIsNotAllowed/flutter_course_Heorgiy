@@ -13,16 +13,16 @@ class _ShoppingBasketState extends State<ShoppingBasket> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 70,
+      width: 80,
       child: Column(
         children: [
-          Icon(
+          const Icon(
             Icons.shopping_cart_outlined,
             color: Colors.white,
           ),
           Text(
             currentTotalPrice.toString(),
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
             ),
           ),
