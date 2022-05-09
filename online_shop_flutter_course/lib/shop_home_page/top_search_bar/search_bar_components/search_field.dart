@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:online_shop_flutter_course/shop_data_manager/shop_data_manager.dart';
 
 class SearchField extends StatefulWidget {
-  const SearchField({Key? key}) : super(key: key);
+  final Function parentSetState;
+
+  const SearchField({Key? key, required this.parentSetState}) : super(key: key);
 
   @override
   State<SearchField> createState() => _SearchFieldState();
@@ -12,8 +15,14 @@ class _SearchFieldState extends State<SearchField> {
 
   @override
   Widget build(BuildContext context) {
-    return const TextField(
-      decoration: InputDecoration(
+    return TextField(
+      onChanged: (String value) {
+        setState(() {
+          DataManager.searched = value;
+          widget.parentSetState();
+        });
+      },
+      decoration: const InputDecoration(
         hintText: "Type to search",
         contentPadding: EdgeInsets.symmetric(horizontal: 8),
         enabledBorder: OutlineInputBorder(

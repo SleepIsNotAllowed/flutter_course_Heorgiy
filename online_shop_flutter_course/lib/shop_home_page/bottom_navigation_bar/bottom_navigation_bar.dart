@@ -37,7 +37,10 @@ class _BottomBarState extends State<BottomBar> {
               text: "Favorite",
             ),
             BottomButton(
-                function: _changeSelected, icon: Icons.more_horiz, text: "More"),
+              function: _changeSelected,
+              icon: Icons.more_horiz,
+              text: "More",
+            ),
           ],
         ),
       ),
@@ -45,8 +48,7 @@ class _BottomBarState extends State<BottomBar> {
   }
 
   _changeSelected(BottomButtonState button) {
-
-    if(selectedButton != null) {
+    if (selectedButton != null) {
       selectedButton!.setSelected(false);
     }
     button.setSelected(true);

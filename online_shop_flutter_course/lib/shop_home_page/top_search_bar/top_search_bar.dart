@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop_flutter_course/shop_home_page/top_search_bar/search_bar_components/search_field.dart';
-import 'package:online_shop_flutter_course/shop_home_page/top_search_bar/search_bar_components/shopping_basket.dart';
+import 'package:online_shop_flutter_course/shop_home_page/top_search_bar/search_bar_components/shopping_cart.dart';
 
 class TopSearchBar extends StatefulWidget {
-  const TopSearchBar({Key? key}) : super(key: key);
+  final Function parentSetState;
+
+  const TopSearchBar({Key? key, required this.parentSetState})
+      : super(key: key);
 
   @override
   State<TopSearchBar> createState() => _TopSearchBarState();
@@ -13,15 +16,17 @@ class _TopSearchBarState extends State<TopSearchBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      height: 65,
       color: Colors.transparent,
-      padding: const EdgeInsets.fromLTRB(15, 15, 5, 5),
+      padding: const EdgeInsets.fromLTRB(15, 10, 5, 5),
       child: Row(
-        children: const [
+        children: [
           Expanded(
-            child: SearchField(),
+            child: SearchField(
+                parentSetState: widget.parentSetState),
           ),
-          ShoppingBasket(),
+          ShoppingCart(
+              parentSetState: widget.parentSetState),
         ],
       ),
     );
