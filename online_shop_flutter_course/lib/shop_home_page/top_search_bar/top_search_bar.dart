@@ -22,11 +22,9 @@ class _TopSearchBarState extends State<TopSearchBar> {
       child: Row(
         children: [
           Expanded(
-            child: SearchField(
-                parentSetState: widget.parentSetState),
+            child: SearchField(parentSetState: widget.parentSetState),
           ),
-          ShoppingCart(
-              parentSetState: widget.parentSetState),
+          ShoppingCart(parentSetState: widget.parentSetState),
         ],
       ),
     );

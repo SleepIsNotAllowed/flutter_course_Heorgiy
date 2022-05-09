@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop_flutter_course/shop_data_manager/shop_data_manager.dart';
+import 'package:online_shop_flutter_course/shop_data_management/shop_data_manager.dart';
 
 class ShoppingCart extends StatefulWidget {
   final Function parentSetState;

@@ -33,11 +33,10 @@ class _ShopHomePageState extends State<ShopHomePage> {
               Expanded(
                   child: ItemsBrowsingGrid(
                 parentSetState: parentSetState,
-                itemsList: ShopItemsList(parentSetState),
               )),
             ],
           ),
-          bottomNavigationBar: BottomBar(),
+          bottomNavigationBar: const BottomBar(),
         ),
       ),
     );

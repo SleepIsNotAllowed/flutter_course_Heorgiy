@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop_flutter_course/shop_data_manager/shop_data_manager.dart';
+import 'package:online_shop_flutter_course/shop_data_management/grid_item_data_holder.dart';
+import 'package:online_shop_flutter_course/shop_data_management/shop_data_manager.dart';
 import 'package:online_shop_flutter_course/shop_home_page/top_search_bar/search_bar_components/shopping_cart.dart';
 
 class GridItem extends StatefulWidget {
@@ -7,13 +8,15 @@ class GridItem extends StatefulWidget {
   final String itemName;
   final int price;
   final Function parentSetState;
+  final GridItemDataHolder dataHolder;
 
   const GridItem(
       {Key? key,
       required this.imageDirectory,
       required this.itemName,
       required this.price,
-      required this.parentSetState})
+      required this.parentSetState,
+      required this.dataHolder})
       : super(key: key);
 
   @override
@@ -21,15 +24,10 @@ class GridItem extends StatefulWidget {
 }
 
 class GridItemState extends State<GridItem> {
-  bool forPurchase = false;
-  bool isFavorite = false;
-  int numberOfPurchased = 0;
-
   @override
   Widget build(BuildContext context) {
-    if(DataManager.totalPriceCount == 0) {
-      forPurchase = false;
-      numberOfPurchased = 0;
+    if (DataManager.totalPriceCount == 0) {
+      widget.dataHolder.numberOfPurchased = 0;
     }
 
     return Container(
@@ -37,7 +35,9 @@ class GridItemState extends State<GridItem> {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
-          color: forPurchase ? Colors.deepPurple : Colors.transparent,
+          color: widget.dataHolder.numberOfPurchased > 0
+              ? Colors.deepPurple
+              : Colors.transparent,
           width: 2,
         ),
         borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -80,8 +80,7 @@ class GridItemState extends State<GridItem> {
         ElevatedButton(
           onPressed: () {
             setState(() {
-              numberOfPurchased++;
-              forPurchase = true;
+              widget.dataHolder.numberOfPurchased++;
               DataManager.totalPriceCount += widget.price;
               widget.parentSetState();
             });
@@ -94,21 +93,35 @@ class GridItemState extends State<GridItem> {
             backgroundColor: MaterialStateProperty.all(Colors.green),
           ),
         ),
-        Text(
-          numberOfPurchased.toString(),
-          style: TextStyle(
-              color:
-                  numberOfPurchased > 0 ? Colors.black54 : Colors.transparent),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              if (widget.dataHolder.numberOfPurchased > 0) {
+                widget.dataHolder.numberOfPurchased--;
+                DataManager.totalPriceCount -= widget.price;
+                widget.parentSetState();
+              }
+            });
+          },
+          child: Text(
+            widget.dataHolder.numberOfPurchased.toString(),
+            style: TextStyle(
+                color: widget.dataHolder.numberOfPurchased > 0
+                    ? Colors.black54
+                    : Colors.transparent),
+          ),
         ),
         IconButton(
             onPressed: () {
               setState(() {
-                isFavorite = !isFavorite;
+                widget.dataHolder.isFavorite = !widget.dataHolder.isFavorite;
               });
             },
             icon: Icon(
-              isFavorite ? Icons.favorite : Icons.favorite_border,
-              color: isFavorite ? Colors.orange : Colors.grey,
+              widget.dataHolder.isFavorite
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: widget.dataHolder.isFavorite ? Colors.orange : Colors.grey,
             )),
       ],
     );

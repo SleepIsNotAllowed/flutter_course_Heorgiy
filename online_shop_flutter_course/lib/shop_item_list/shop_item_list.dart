@@ -19,19 +19,4 @@ class ShopItemsList {
     (i) => 'assets/shop_items_images/image$i.jpg',
   );
   static final List prices = [100, 150, 200, 100, 70, 300, 120, 130, 350];
-
-  List<GridItem> itemsList;
-
-  ShopItemsList(Function parentSetState)
-      : itemsList = List.generate(
-            9,
-            (i) => GridItem(
-                parentSetState: parentSetState,
-                imageDirectory: images[i],
-                itemName: names[i],
-                price: prices[i]));
-
-  List<GridItem> getFullItemsList() {
-    return itemsList;
-  }
 }
