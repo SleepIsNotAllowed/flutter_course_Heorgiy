@@ -60,7 +60,7 @@ class _ItemsBrowsingGridState extends State<ItemsBrowsingGrid> {
     } else {
       for (int i = 0; i < ShopItemsList.names.length; i++) {
         String currentName = ShopItemsList.names[i];
-        if (currentName.contains(searched)) {
+        if (currentName.toLowerCase().contains(searched.toLowerCase())) {
           listItems.add(itemsList[i]);
         }
       }

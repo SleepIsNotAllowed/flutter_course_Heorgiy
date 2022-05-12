@@ -48,10 +48,12 @@ class _BottomBarState extends State<BottomBar> {
   }
 
   _changeSelected(BottomButtonState button) {
-    if (selectedButton != null) {
-      selectedButton!.setSelected(false);
-    }
-    button.setSelected(true);
-    selectedButton = button;
+    setState(() {
+      if (selectedButton != null) {
+        selectedButton!.setSelected(false);
+      }
+      button.setSelected(true);
+      selectedButton = button;
+    });
   }
 }

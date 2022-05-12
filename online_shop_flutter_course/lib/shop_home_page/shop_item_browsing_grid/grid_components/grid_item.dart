@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop_flutter_course/shop_data_management/grid_item_data_holder.dart';
 import 'package:online_shop_flutter_course/shop_data_management/shop_data_manager.dart';
-import 'package:online_shop_flutter_course/shop_home_page/top_search_bar/search_bar_components/shopping_cart.dart';
 
-class GridItem extends StatefulWidget {
+class GridItem extends StatelessWidget {
   final String imageDirectory;
   final String itemName;
   final int price;
@@ -20,14 +19,9 @@ class GridItem extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<GridItem> createState() => GridItemState();
-}
-
-class GridItemState extends State<GridItem> {
-  @override
   Widget build(BuildContext context) {
     if (DataManager.totalPriceCount == 0) {
-      widget.dataHolder.numberOfPurchased = 0;
+      dataHolder.numberOfPurchased = 0;
     }
 
     return Container(
@@ -35,7 +29,7 @@ class GridItemState extends State<GridItem> {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
-          color: widget.dataHolder.numberOfPurchased > 0
+          color: dataHolder.numberOfPurchased > 0
               ? Colors.deepPurple
               : Colors.transparent,
           width: 2,
@@ -48,10 +42,10 @@ class GridItemState extends State<GridItem> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-              child: Image.asset(widget.imageDirectory, fit: BoxFit.cover),
+              child: Image.asset(imageDirectory, fit: BoxFit.cover),
             ),
             Text(
-              widget.itemName,
+              itemName,
               style: const TextStyle(color: Colors.black54),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
@@ -59,7 +53,7 @@ class GridItemState extends State<GridItem> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                widget.price.toString() + ' usd',
+                price.toString() + ' usd',
                 style: const TextStyle(color: Colors.green, fontSize: 18),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -79,11 +73,9 @@ class GridItemState extends State<GridItem> {
       children: [
         ElevatedButton(
           onPressed: () {
-            setState(() {
-              widget.dataHolder.numberOfPurchased++;
-              DataManager.totalPriceCount += widget.price;
-              widget.parentSetState();
-            });
+            dataHolder.numberOfPurchased++;
+            DataManager.totalPriceCount += price;
+            parentSetState();
           },
           child: const Text(
             "   Buy   ",
@@ -95,33 +87,28 @@ class GridItemState extends State<GridItem> {
         ),
         GestureDetector(
           onTap: () {
-            setState(() {
-              if (widget.dataHolder.numberOfPurchased > 0) {
-                widget.dataHolder.numberOfPurchased--;
-                DataManager.totalPriceCount -= widget.price;
-                widget.parentSetState();
-              }
-            });
+            if (dataHolder.numberOfPurchased > 0) {
+              dataHolder.numberOfPurchased--;
+              DataManager.totalPriceCount -= price;
+              parentSetState();
+            }
           },
           child: Text(
-            widget.dataHolder.numberOfPurchased.toString(),
+            dataHolder.numberOfPurchased.toString(),
             style: TextStyle(
-                color: widget.dataHolder.numberOfPurchased > 0
+                color: dataHolder.numberOfPurchased > 0
                     ? Colors.black54
                     : Colors.transparent),
           ),
         ),
         IconButton(
             onPressed: () {
-              setState(() {
-                widget.dataHolder.isFavorite = !widget.dataHolder.isFavorite;
-              });
+              dataHolder.isFavorite = !dataHolder.isFavorite;
+              parentSetState();
             },
             icon: Icon(
-              widget.dataHolder.isFavorite
-                  ? Icons.favorite
-                  : Icons.favorite_border,
-              color: widget.dataHolder.isFavorite ? Colors.orange : Colors.grey,
+              dataHolder.isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: dataHolder.isFavorite ? Colors.orange : Colors.grey,
             )),
       ],
     );

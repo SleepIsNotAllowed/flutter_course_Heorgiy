@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop_flutter_course/shop_data_management/shop_data_manager.dart';
 
-class ShoppingCart extends StatefulWidget {
+class ShoppingCart extends StatelessWidget {
   final Function parentSetState;
 
   const ShoppingCart({Key? key, required this.parentSetState})
       : super(key: key);
 
-  @override
-  State<ShoppingCart> createState() => ShoppingCartState();
-}
-
-class ShoppingCartState extends State<ShoppingCart> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -26,7 +21,7 @@ class ShoppingCartState extends State<ShoppingCart> {
         IconButton(
           onPressed: () {
             DataManager.totalPriceCount = 0;
-            widget.parentSetState();
+            parentSetState();
           },
           alignment: Alignment.center,
           padding: const EdgeInsets.all(0),

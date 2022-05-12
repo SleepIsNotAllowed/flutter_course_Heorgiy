@@ -1,26 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop_flutter_course/shop_data_management/shop_data_manager.dart';
 
-class SearchField extends StatefulWidget {
+class SearchField extends StatelessWidget {
   final Function parentSetState;
 
   const SearchField({Key? key, required this.parentSetState}) : super(key: key);
 
   @override
-  State<SearchField> createState() => _SearchFieldState();
-}
-
-class _SearchFieldState extends State<SearchField> {
-  bool isUsed = false;
-
-  @override
   Widget build(BuildContext context) {
     return TextField(
       onChanged: (String value) {
-        setState(() {
-          DataManager.searched = value;
-          widget.parentSetState();
-        });
+        DataManager.searched = value;
+        parentSetState();
       },
       decoration: const InputDecoration(
         hintText: "Type to search",

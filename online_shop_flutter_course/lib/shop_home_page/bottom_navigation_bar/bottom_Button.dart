@@ -44,8 +44,6 @@ class BottomButtonState extends State<BottomButton> {
   }
 
   setSelected(bool isSelected) {
-    setState(() {
-      this.isSelected = isSelected;
-    });
+    this.isSelected = isSelected;
   }
 }
