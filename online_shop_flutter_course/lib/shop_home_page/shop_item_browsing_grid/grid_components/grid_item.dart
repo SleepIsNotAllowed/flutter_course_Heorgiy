@@ -59,7 +59,7 @@ class _GridItemState extends State<GridItem> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ShopItemPage(
+              builder: (context) => ItemFullViewPage(
                 dataHolder: widget.dataHolder,
                 dataManager: widget.dataManager,
               ),

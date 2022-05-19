@@ -50,7 +50,7 @@ class _InCartGridItemState extends State<InCartGridItem> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ShopItemPage(
+              builder: (context) => ItemFullViewPage(
                 dataHolder: widget.dataHolder,
                 dataManager: widget.dataManager,
               ),
