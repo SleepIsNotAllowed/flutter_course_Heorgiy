@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop_flutter_course/shop_home_page/shop_home_page.dart';
+import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,8 +11,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: ShopHomePage(),
+    return MaterialApp(
+      home: ShopHomePage(dataManager: DataManager()),
     );
   }
 }

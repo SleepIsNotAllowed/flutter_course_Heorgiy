@@ -1,49 +1,44 @@
 import 'package:flutter/material.dart';
 
-class BottomButton extends StatefulWidget {
-  final Function function;
+class BottomButton extends StatelessWidget {
+  final Function(int) function;
   final IconData icon;
   final String text;
+  final int indexOfButton;
+  final int indexOfChosen;
 
   const BottomButton(
       {Key? key,
       required this.function,
       required this.icon,
-      required this.text})
+      required this.text,
+      required this.indexOfButton,
+      required this.indexOfChosen})
       : super(key: key);
 
   @override
-  State<BottomButton> createState() => BottomButtonState();
-}
-
-class BottomButtonState extends State<BottomButton> {
-  bool isSelected = false;
-
-  @override
   Widget build(BuildContext context) {
-    Color color = isSelected ? Colors.deepPurple : Colors.black54;
+    Color color = indexOfChosen == indexOfButton
+        ? Colors.deepPurple
+        : Colors.black54;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         IconButton(
           padding: const EdgeInsets.all(4),
-          onPressed: () => widget.function(this),
+          onPressed: () => function(indexOfButton),
           visualDensity: const VisualDensity(vertical: -4),
           icon: Icon(
-            widget.icon,
+            icon,
             color: color,
           ),
         ),
         Text(
-          widget.text,
+          text,
           style: TextStyle(color: color),
         ),
       ],
     );
-  }
-
-  setSelected(bool isSelected) {
-    this.isSelected = isSelected;
   }
 }

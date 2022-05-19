@@ -9,7 +9,7 @@ class BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<BottomBar> {
-  BottomButtonState? selectedButton;
+  int indexOfActiveButton = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -25,21 +25,29 @@ class _BottomBarState extends State<BottomBar> {
               function: _changeSelected,
               icon: Icons.reviews_outlined,
               text: "Reviews",
+              indexOfButton: 1,
+              indexOfChosen: indexOfActiveButton,
             ),
             BottomButton(
               function: _changeSelected,
               icon: Icons.grid_view,
               text: "Browse",
+              indexOfButton: 2,
+              indexOfChosen: indexOfActiveButton,
             ),
             BottomButton(
               function: _changeSelected,
               icon: Icons.favorite_border,
               text: "Favorite",
+              indexOfButton: 3,
+              indexOfChosen: indexOfActiveButton,
             ),
             BottomButton(
               function: _changeSelected,
               icon: Icons.more_horiz,
               text: "More",
+              indexOfButton: 4,
+              indexOfChosen: indexOfActiveButton,
             ),
           ],
         ),
@@ -47,13 +55,9 @@ class _BottomBarState extends State<BottomBar> {
     );
   }
 
-  _changeSelected(BottomButtonState button) {
+  _changeSelected(int buttonIndex) {
     setState(() {
-      if (selectedButton != null) {
-        selectedButton!.setSelected(false);
-      }
-      button.setSelected(true);
-      selectedButton = button;
+      indexOfActiveButton = buttonIndex;
     });
   }
 }

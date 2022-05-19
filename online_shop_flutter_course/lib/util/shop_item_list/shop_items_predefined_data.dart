@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-
-import '../shop_home_page/shop_item_browsing_grid/grid_components/grid_item.dart';
-
 class ShopItemsList {
+  static const int length = 9;
   static final List names = [
     "Mens Citizen Navihawk AT Alarm Chronograph Radio Controlled Eco-Drive Watch",
     "Mens Citizen Endeavour Watch",

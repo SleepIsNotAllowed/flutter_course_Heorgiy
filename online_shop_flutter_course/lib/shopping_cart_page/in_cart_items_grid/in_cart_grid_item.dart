@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop_flutter_course/shop_item_page/shop_item_page.dart';
-import '../../../util/shop_data_management/grid_item_data_holder.dart';
-import '../../../util/shop_data_management/shop_data_manager.dart';
+import 'package:online_shop_flutter_course/util/shop_data_management/grid_item_data_holder.dart';
+import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
 
-class GridItem extends StatefulWidget {
+class InCartGridItem extends StatefulWidget {
   final VoidCallback parentSetState;
   final GridItemDataHolder dataHolder;
   final DataManager dataManager;
 
-  const GridItem(
+  const InCartGridItem(
       {Key? key,
       required this.parentSetState,
       required this.dataHolder,
@@ -16,27 +16,18 @@ class GridItem extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _GridItemState();
+  State<StatefulWidget> createState() => _InCartGridItemState();
 }
 
-class _GridItemState extends State<GridItem> {
+class _InCartGridItemState extends State<InCartGridItem> {
   @override
   Widget build(BuildContext context) {
-    if (widget.dataManager.totalPriceCount == 0) {
-      widget.dataHolder.numberOfPurchased = 0;
-    }
 
     return Container(
       padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border.all(
-          color: widget.dataHolder.numberOfPurchased > 0
-              ? Colors.deepPurple
-              : Colors.transparent,
-          width: 2,
-        ),
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
       child: SizedBox(
         child: Column(
@@ -78,15 +69,23 @@ class _GridItemState extends State<GridItem> {
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                widget.dataHolder.price.toString() + ' usd',
-                style: const TextStyle(color: Colors.green, fontSize: 18),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.dataHolder.price.toString() + ' usd',
+                  style: const TextStyle(color: Colors.green, fontSize: 18),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                Text(
+                  'Added: ' + widget.dataHolder.numberOfPurchased.toString(),
+                  style: const TextStyle(color: Colors.black54, fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ],
+            )
           ],
         ),
       ),
@@ -106,43 +105,27 @@ class _GridItemState extends State<GridItem> {
             });
           },
           child: const Text(
-            "   Buy   ",
+            " Add ",
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all(Colors.green),
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            if (widget.dataHolder.numberOfPurchased > 0) {
-              setState(() {
-                widget.dataHolder.numberOfPurchased--;
-                widget.dataManager.totalPriceCount -= widget.dataHolder.price;
-                widget.parentSetState();
-              });
-            }
-          },
-          child: Text(
-            widget.dataHolder.numberOfPurchased.toString(),
-            style: TextStyle(
-                color: widget.dataHolder.numberOfPurchased > 0
-                    ? Colors.black54
-                    : Colors.transparent),
-          ),
-        ),
-        IconButton(
+        ElevatedButton(
           onPressed: () {
             setState(() {
-              widget.dataHolder.isFavorite = !widget.dataHolder.isFavorite;
+              widget.dataHolder.numberOfPurchased--;
+              widget.dataManager.totalPriceCount -= widget.dataHolder.price;
               widget.parentSetState();
             });
           },
-          icon: Icon(
-            widget.dataHolder.isFavorite
-                ? Icons.favorite
-                : Icons.favorite_border,
-            color: widget.dataHolder.isFavorite ? Colors.orange : Colors.grey,
+          child: const Text(
+            "Remove",
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.red),
           ),
         ),
       ],
