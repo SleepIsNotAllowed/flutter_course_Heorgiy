@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:online_shop_flutter_course/pages/shop_home_page/widgets/top_app_bar/app_bar_components/shopping_cart.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/grid_item_data_holder.dart';
-import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
+import 'package:online_shop_flutter_course/util/shop_data_management/data_manager.dart';
 
 class ItemFullViewPage extends StatefulWidget {
   final GridItemDataHolder dataHolder;
@@ -19,6 +20,8 @@ class ItemFullViewPage extends StatefulWidget {
 class _ItemFullViewPageState extends State<ItemFullViewPage> {
   @override
   Widget build(BuildContext context) {
+    var totalCost = widget.dataManager.totalPriceCount;
+
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -29,6 +32,11 @@ class _ItemFullViewPageState extends State<ItemFullViewPage> {
               colors: [Colors.deepPurple, Colors.pink],
             ),
           ),
+        ),
+        title: Text(
+          'Total cost: $totalCost',
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+          textAlign: TextAlign.center,
         ),
       ),
       backgroundColor: Colors.grey[100],

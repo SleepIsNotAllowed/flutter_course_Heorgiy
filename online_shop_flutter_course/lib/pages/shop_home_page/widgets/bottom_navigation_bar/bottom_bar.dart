@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop_flutter_course/pages/shop_home_page/widgets/bottom_navigation_bar/bottom_Button.dart';
+import 'package:online_shop_flutter_course/pages/shop_home_page/widgets/bottom_navigation_bar/bottom_button.dart';
 
 class BottomBar extends StatefulWidget {
   const BottomBar({Key? key}) : super(key: key);

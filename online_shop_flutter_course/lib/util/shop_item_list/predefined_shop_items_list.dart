@@ -1,4 +1,4 @@
-class ShopItemsList {
+class PredefinedShopItemsList {
   static const int length = 9;
   static final List names = [
     "Mens Citizen Navihawk AT Alarm Chronograph Radio Controlled Eco-Drive Watch",

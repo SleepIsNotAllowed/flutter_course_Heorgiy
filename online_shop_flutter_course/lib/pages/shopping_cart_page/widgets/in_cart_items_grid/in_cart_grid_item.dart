@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop_flutter_course/pages/shop_item_page/shop_item_page.dart';
+import 'package:online_shop_flutter_course/pages/item_full_view_page/item_full_view_page.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/grid_item_data_holder.dart';
-import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
+import 'package:online_shop_flutter_course/util/shop_data_management/data_manager.dart';
 
 class InCartGridItem extends StatefulWidget {
   final VoidCallback parentSetState;
