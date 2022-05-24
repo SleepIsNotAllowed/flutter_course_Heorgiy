@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BottomButton extends StatelessWidget {
-  final Function(int) function;
+  final void Function(int) function;
   final IconData icon;
   final String text;
   final int indexOfButton;

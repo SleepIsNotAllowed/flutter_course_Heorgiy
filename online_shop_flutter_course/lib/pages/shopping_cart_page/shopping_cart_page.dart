@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop_flutter_course/shopping_cart_page/in_cart_items_grid/in_cart_items_grid.dart';
+import 'package:online_shop_flutter_course/pages/shopping_cart_page/widgets/in_cart_items_grid/in_cart_items_grid.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/grid_item_data_holder.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
-
 
 class ShoppingCartPage extends StatefulWidget {
   final List<GridItemDataHolder> itemsData;
@@ -21,6 +20,8 @@ class ShoppingCartPage extends StatefulWidget {
 class _ShoppingCartPageState extends State<ShoppingCartPage> {
   @override
   Widget build(BuildContext context) {
+    var totalCost = widget.dataManager.totalPriceCount;
+
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -32,6 +33,10 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
             ),
           ),
         ),
+        title: Text(
+          'Total cost: $totalCost',
+          style: const TextStyle(color: Colors.white, fontSize: 16),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8),
@@ -39,7 +44,7 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
               onPressed: () {
                 setState(() {
                   widget.dataManager.totalPriceCount = 0;
-                  for(GridItemDataHolder itemData in widget.itemsData){
+                  for (GridItemDataHolder itemData in widget.itemsData) {
                     itemData.numberOfPurchased = 0;
                   }
                 });

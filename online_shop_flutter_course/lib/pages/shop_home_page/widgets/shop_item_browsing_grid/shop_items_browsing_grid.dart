@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
 
-import '../../util/shop_data_management/shop_data_manager.dart';
 import 'grid_components/grid_item.dart';
 
 class ItemsBrowsingGrid extends StatelessWidget {

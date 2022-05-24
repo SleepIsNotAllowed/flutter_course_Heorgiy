@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop_flutter_course/shop_home_page/bottom_navigation_bar/bottom_navigation_bar.dart';
-import 'package:online_shop_flutter_course/shop_home_page/shop_item_browsing_grid/grid_components/grid_item.dart';
-import 'package:online_shop_flutter_course/shop_home_page/shop_item_browsing_grid/shop_items_browsing_grid.dart';
-import 'package:online_shop_flutter_course/shop_home_page/top_app_bar/app_bar_components/search_field.dart';
-import 'package:online_shop_flutter_course/shop_home_page/top_app_bar/app_bar_components/shopping_cart.dart';
+import 'package:online_shop_flutter_course/pages/shop_home_page/widgets/bottom_navigation_bar/bottom_navigation_bar.dart';
+import 'package:online_shop_flutter_course/pages/shop_home_page/widgets/shop_item_browsing_grid/grid_components/grid_item.dart';
+import 'package:online_shop_flutter_course/pages/shop_home_page/widgets/shop_item_browsing_grid/shop_items_browsing_grid.dart';
+import 'package:online_shop_flutter_course/pages/shop_home_page/widgets/top_app_bar/app_bar_components/search_field.dart';
+import 'package:online_shop_flutter_course/pages/shop_home_page/widgets/top_app_bar/app_bar_components/shopping_cart.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
 
-import '../util/shop_data_management/grid_item_data_holder.dart';
-import '../util/shop_item_list/shop_items_predefined_data.dart';
+import 'package:online_shop_flutter_course/util/shop_data_management/grid_item_data_holder.dart';
+import 'package:online_shop_flutter_course/util/shop_item_list/shop_items_predefined_data.dart';
 
 class ShopHomePage extends StatefulWidget {
   final DataManager dataManager;

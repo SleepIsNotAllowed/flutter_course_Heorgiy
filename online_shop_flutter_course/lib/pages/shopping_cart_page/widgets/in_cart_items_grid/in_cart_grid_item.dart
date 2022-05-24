@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop_flutter_course/shop_item_page/shop_item_page.dart';
+import 'package:online_shop_flutter_course/pages/shop_item_page/shop_item_page.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/grid_item_data_holder.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
 
@@ -29,16 +29,14 @@ class _InCartGridItemState extends State<InCartGridItem> {
         color: Colors.white,
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
-      child: SizedBox(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildShortItemView(),
-            const Divider(height: 2, thickness: 1),
-            _buildButtonRow(),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildShortItemView(),
+          const Divider(height: 2, thickness: 1),
+          _buildButtonRow(),
+        ],
       ),
     );
   }
@@ -74,15 +72,15 @@ class _InCartGridItemState extends State<InCartGridItem> {
               children: [
                 Text(
                   widget.dataHolder.price.toString() + ' usd',
-                  style: const TextStyle(color: Colors.green, fontSize: 18),
+                  style: const TextStyle(color: Colors.green, fontSize: 16),
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                  maxLines: 2,
                 ),
                 Text(
                   'Added: ' + widget.dataHolder.numberOfPurchased.toString(),
                   style: const TextStyle(color: Colors.black54, fontSize: 16),
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                  maxLines: 2,
                 ),
               ],
             )

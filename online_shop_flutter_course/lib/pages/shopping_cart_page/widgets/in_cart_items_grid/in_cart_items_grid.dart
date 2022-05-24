@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:online_shop_flutter_course/shopping_cart_page/in_cart_items_grid/in_cart_grid_item.dart';
+import 'package:online_shop_flutter_course/pages/shopping_cart_page/widgets/in_cart_items_grid/in_cart_grid_item.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/grid_item_data_holder.dart';
 import 'package:online_shop_flutter_course/util/shop_data_management/shop_data_manager.dart';
 
