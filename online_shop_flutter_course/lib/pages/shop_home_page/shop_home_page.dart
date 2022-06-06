@@ -19,28 +19,27 @@ class ShopHomePage extends StatefulWidget {
 }
 
 class _ShopHomePageState extends State<ShopHomePage> {
-  late List<GridItemDataHolder> itemsData = [];
-  late List<GridItem> itemsList;
-
   @override
   void initState() {
-    for (int i = 0; i < PredefinedShopItemsList.length; i++) {
-      GridItemDataHolder itemData = GridItemDataHolder();
-      itemData.name = PredefinedShopItemsList.names[i];
-      itemData.imageDirectory = PredefinedShopItemsList.images[i];
-      itemData.price = PredefinedShopItemsList.prices[i];
-      itemsData.add(itemData);
-    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    itemsList = List.generate(
+    if (widget.dataManager.itemsData.isEmpty) {
+      for (int i = 0; i < PredefinedShopItemsList.length; i++) {
+        GridItemDataHolder itemData = GridItemDataHolder();
+        itemData.name = PredefinedShopItemsList.names[i];
+        itemData.imageDirectory = PredefinedShopItemsList.images[i];
+        itemData.price = PredefinedShopItemsList.prices[i];
+        widget.dataManager.itemsData.add(itemData);
+      }
+    }
+    widget.dataManager.itemsList = List.generate(
       9,
       (i) => GridItem(
         parentSetState: () => setState(() {}),
-        dataHolder: itemsData[i],
+        dataHolder: widget.dataManager.itemsData[i],
         dataManager: widget.dataManager,
       ),
     );
@@ -64,13 +63,11 @@ class _ShopHomePageState extends State<ShopHomePage> {
           ShoppingCart(
             parentSetState: () => setState(() {}),
             dataManager: widget.dataManager,
-            itemsData: itemsData,
           ),
         ],
       ),
       body: ItemsBrowsingGrid(
         dataManager: widget.dataManager,
-        itemsList: itemsList,
       ),
       bottomNavigationBar: const BottomBar(),
     );

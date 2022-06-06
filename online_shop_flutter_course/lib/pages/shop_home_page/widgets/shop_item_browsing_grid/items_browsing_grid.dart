@@ -5,12 +5,10 @@ import 'grid_components/grid_item.dart';
 
 class ItemsBrowsingGrid extends StatelessWidget {
   final DataManager dataManager;
-  final List<GridItem> itemsList;
 
   const ItemsBrowsingGrid({
     Key? key,
     required this.dataManager,
-    required this.itemsList,
   }) : super(key: key);
 
   @override
@@ -33,12 +31,12 @@ class ItemsBrowsingGrid extends StatelessWidget {
     List<GridItem> itemsList = [];
 
     if (searched.isEmpty) {
-      itemsList = this.itemsList;
+      itemsList = dataManager.itemsList;
     } else {
-      for (int i = 0; i < this.itemsList.length; i++) {
-        String currentName = this.itemsList[i].dataHolder.name;
+      for (int i = 0; i < dataManager.itemsList.length; i++) {
+        String currentName = dataManager.itemsList[i].dataHolder.name;
         if (currentName.toLowerCase().contains(searched.toLowerCase())) {
-          itemsList.add(this.itemsList[i]);
+          itemsList.add(dataManager.itemsList[i]);
         }
       }
     }

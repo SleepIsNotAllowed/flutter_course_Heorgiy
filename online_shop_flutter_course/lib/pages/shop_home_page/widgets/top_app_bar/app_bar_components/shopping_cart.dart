@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:online_shop_flutter_course/pages/shopping_cart_page/shopping_cart_page.dart';
-import 'package:online_shop_flutter_course/util/shop_data_management/grid_item_data_holder.dart';
 
 import 'package:online_shop_flutter_course/util/shop_data_management/data_manager.dart';
 
 class ShoppingCart extends StatelessWidget {
   final DataManager dataManager;
   final VoidCallback parentSetState;
-  final List<GridItemDataHolder> itemsData;
 
   const ShoppingCart({
     Key? key,
     required this.parentSetState,
     required this.dataManager,
-    required this.itemsData,
   }) : super(key: key);
 
   @override
@@ -34,7 +31,7 @@ class ShoppingCart extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ShoppingCartPage(
-                        itemsData: itemsData,
+                        itemsData: dataManager.itemsData,
                         dataManager: dataManager,
                       ),
                     ),
@@ -64,7 +61,7 @@ class ShoppingCart extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ShoppingCartPage(
-                    itemsData: itemsData,
+                    itemsData: dataManager.itemsData,
                     dataManager: dataManager,
                   ),
                 ),
