@@ -14,11 +14,11 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  firebase_storage: ^8.0.3
-  cloud_firestore: ^1.0.5
   firebase_auth: ^1.1.0
   google_sign_in: ^5.3.2
   font_awesome_flutter: ^10.1.0
+  http: ^0.13.4
+  googleapis: ^9.1.0
 
 dev_dependencies:
   flutter_test:
@@ -31,4 +31,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - images/space-wallpaper.jpg
+    - images/

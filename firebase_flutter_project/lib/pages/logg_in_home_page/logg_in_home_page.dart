@@ -1,7 +1,8 @@
-import 'package:firebase_flutter_project/pages/user_account_page/user_account_page.dart';
+import 'package:firebase_flutter_project/pages/file_view_page/file_view_page.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/drive/v3.dart';
 
 class LoggInHomePage extends StatefulWidget {
   const LoggInHomePage({
@@ -13,12 +14,21 @@ class LoggInHomePage extends StatefulWidget {
 }
 
 class _LoggInHomePageState extends State<LoggInHomePage> {
-  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
+  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
+    DriveApi.driveScope,
+    DriveApi.driveFileScope,
+    DriveApi.driveReadonlyScope,
+    DriveApi.driveMetadataReadonlyScope,
+    DriveApi.driveAppdataScope,
+    DriveApi.driveMetadataScope,
+    DriveApi.drivePhotosReadonlyScope,
+  ]);
+  GoogleSignInAccount? user;
+  GoogleSignInAuthentication? auth;
+  bool isInProgress = false;
 
   @override
   Widget build(BuildContext context) {
-    GoogleSignInAccount? user = googleSignIn.currentUser;
-
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -40,54 +50,71 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                const Text(
-                  'Logg In with Google',
-                  style: TextStyle(
+                Text(
+                  isInProgress ? 'In progress' : 'Logg In with Google',
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 28,
                     color: Colors.white,
                   ),
                 ),
                 Text(
-                  user == null ? 'Please, logg in to continue' : 'You logged',
+                  isInProgress
+                      ? 'Logging In...'
+                      : 'Please, logg in to continue',
                   maxLines: 2,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
                     color: Colors.white,
                   ),
                 ),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.white,
-                    onPrimary: Colors.black54,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  onPressed: () async {
-                    await googleSignIn.signIn().then((value) => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UserAccountPage(
-                                googleSignIn: googleSignIn),
+                isInProgress
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.white,
+                          onPrimary: Colors.black54,
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                        onPressed: () async {
+                          setState(() {
+                            isInProgress = true;
+                          });
+                          loggInGoogle(context).then(
+                            (value) => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FileViewPage(
+                                  googleSignIn: googleSignIn,
+                                  auth: auth,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const FaIcon(
+                          FontAwesomeIcons.google,
+                          color: Colors.blue,
+                        ),
+                        label: const Text(
+                          'Sign In with Google',
+                          style: TextStyle(
+                            fontSize: 16,
                           ),
-                        ));
-                  },
-                  icon: const FaIcon(
-                    FontAwesomeIcons.google,
-                    color: Colors.blue,
-                  ),
-                  label: const Text(
-                    'Sign In with Google',
-                    style: TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
+                        ),
+                      ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> loggInGoogle(BuildContext context) async {
+    user = await googleSignIn.signIn();
+    auth = await user?.authentication;
   }
 }
