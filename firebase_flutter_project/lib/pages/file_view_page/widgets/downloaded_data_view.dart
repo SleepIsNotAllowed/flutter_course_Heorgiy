@@ -1,29 +1,31 @@
+import 'package:firebase_flutter_project/pages/file_view_page/file_view_page.dart';
+import 'package:firebase_flutter_project/pages/file_view_page/widgets/item_grid_tile.dart';
+import 'package:firebase_flutter_project/pages/file_view_page/widgets/item_list_tile.dart';
 import 'package:firebase_flutter_project/util/drive_item_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 
-class DownloadedDataView extends StatefulWidget {
+class DownloadedDataView extends StatelessWidget {
   final List<DriveItemData> itemsData;
   final GoogleSignInAuthentication? auth;
+  final bool isGridView;
+  final GoogleSignIn googleSignIn;
+  final VoidCallback refreshFileList;
 
   const DownloadedDataView({
     Key? key,
     required this.itemsData,
     required this.auth,
+    required this.isGridView,
+    required this.googleSignIn,
+    required this.refreshFileList,
   }) : super(key: key);
 
   @override
-  State<DownloadedDataView> createState() => _DownloadedDataViewState();
-}
-
-class _DownloadedDataViewState extends State<DownloadedDataView> {
-  IconData reservedIcon = Icons.list_rounded;
-  IconData currentIcon = Icons.grid_view_rounded;
-
-  @override
   Widget build(BuildContext context) {
+    IconData listIcon = Icons.grid_view_rounded;
+    IconData gridIcon = Icons.list_rounded;
+
     return Column(
       children: [
         DecoratedBox(
@@ -34,20 +36,47 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
                 width: 2,
               ),
             ),
-            color: Colors.grey.shade700,
+            color: Colors.grey.shade800,
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: null,
+                    icon: Icon(
+                      Icons.delete_rounded,
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.cloud_download_rounded,
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
+                ],
+              ),
               IconButton(
-                onPressed: () => setState(() {
-                  IconData holder = currentIcon;
-                  currentIcon = reservedIcon;
-                  reservedIcon = holder;
-                }),
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FileViewPage(
+                        googleSignIn: googleSignIn,
+                        isGridView: !isGridView,
+                        auth: auth,
+                        itemsData: itemsData,
+                      ),
+                    ),
+                  );
+                },
                 icon: Icon(
-                  currentIcon,
-                  color: Colors.white,
+                  isGridView ? gridIcon : listIcon,
+                  color: Colors.grey.shade400,
                 ),
               ),
             ],
@@ -55,71 +84,60 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
         ),
         Expanded(
           child: RefreshIndicator(
-            child: GridView.count(
-              crossAxisCount: 3,
-              padding: const EdgeInsets.all(8),
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              children: _buildGridItems(),
-            ),
-            onRefresh: refreshFileList,
+            child: isGridView ? _buildGridView() : _buildListView(),
+            onRefresh: _refresh,
           ),
         ),
       ],
     );
   }
 
-  List<Widget> _buildGridItems() {
+  Widget _buildGridView() {
     List<Widget> gridItems = [];
 
-    for (DriveItemData item in widget.itemsData) {
-      gridItems.add(GridTile(
-        child: Image(
-          image: NetworkImage(item.iconLink),
-          fit: BoxFit.cover,
-        ),
-        footer: GridTileBar(
-          backgroundColor: Colors.grey.shade700,
-          trailing: Image.network(item.iconLink),
-          title: Text(item.name, overflow: TextOverflow.ellipsis),
-          subtitle: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'size: ' + item.size,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.start,
-              ),
-              Text(
-                'date: ' + item.createdTime,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.start,
-              ),
-            ],
+    for (DriveItemData item in itemsData) {
+      gridItems.add(
+        Hero(
+          tag: item.id,
+          child: ItemGridTile(
+            auth: auth,
+            itemData: item,
           ),
         ),
-      ));
+      );
     }
 
-    return gridItems;
+    return GridView.count(
+      crossAxisCount: 2,
+      padding: const EdgeInsets.all(16),
+      crossAxisSpacing: 16,
+      mainAxisSpacing: 16,
+      children: gridItems,
+    );
   }
 
-  Future<void> refreshFileList() async {
-    widget.itemsData.clear();
-    var response = await http.get(
-      Uri.https(
-        'www.googleapis.com',
-        '/drive/v3/files',
-        {'fields': 'files(id,iconLink,name,createdTime,size,thumbnailLink)'},
-      ),
-      headers: {'authorization': 'Bearer ${widget.auth?.accessToken}'},
-    );
-    var jsonResponse =
-        convert.jsonDecode(response.body) as Map<String, dynamic>;
-    List jsonItemsList = jsonResponse['files'];
-    for (Map item in jsonItemsList) {
-      widget.itemsData.add(DriveItemData.fromJson(item));
+  Widget _buildListView() {
+    List<Widget> listItems = [];
+
+    for (DriveItemData item in itemsData) {
+      listItems.add(
+        Hero(
+          tag: item.id,
+          child: ItemListTile(
+            auth: auth,
+            itemData: item,
+          ),
+        ),
+      );
     }
-    setState(() {});
+
+    return ListView(
+      children: listItems,
+      padding: const EdgeInsets.all(16),
+    );
+  }
+
+  Future<void> _refresh() async {
+    refreshFileList();
   }
 }

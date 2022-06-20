@@ -89,6 +89,7 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
                                 builder: (context) => FileViewPage(
                                   googleSignIn: googleSignIn,
                                   auth: auth,
+                                  isGridView: true,
                                 ),
                               ),
                             ),
