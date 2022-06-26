@@ -82,7 +82,7 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
                           setState(() {
                             isInProgress = true;
                           });
-                          loggInGoogle(context).then(
+                          loggInGoogle().then(
                             (value) => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -117,7 +117,7 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
     );
   }
 
-  Future<void> loggInGoogle(BuildContext context) async {
+  Future<void> loggInGoogle() async {
     user = await googleSignIn.signIn();
     auth = await user?.authentication;
   }

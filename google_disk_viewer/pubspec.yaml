@@ -1,7 +1,6 @@
 name: firebase_flutter_project
 description: A new Flutter project.
 
-
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
@@ -21,6 +20,7 @@ dependencies:
   googleapis: ^9.1.0
   flowder: ^0.2.0
   file_picker: ^4.6.1
+  dio: ^4.0.6
 
 dev_dependencies:
   flutter_test:

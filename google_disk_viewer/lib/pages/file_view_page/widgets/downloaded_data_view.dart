@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/item_grid_tile.dart';
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/item_list_tile.dart';
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/user_greeting_view.dart';
@@ -77,27 +79,31 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: _isItemSelected()
+                          ? () => _deleteSelectedFile()
+                          : null,
                       icon: Icon(
                         Icons.delete_rounded,
                         color: _isItemSelected()
-                            ? Colors.transparent
-                            : Colors.grey.shade400,
+                            ? Colors.grey.shade400
+                            : Colors.transparent,
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: _isItemSelected()
+                          ? () => _downloadSelectedFile()
+                          : null,
                       icon: Icon(
                         Icons.cloud_download_rounded,
                         color: _isItemSelected()
-                            ? Colors.transparent
-                            : Colors.grey.shade400,
+                            ? Colors.grey.shade400
+                            : Colors.transparent,
                       ),
                     ),
                     SizedBox(
                       width: 150,
                       child: Text(
-                        _isItemSelected() ? '' : selectedItem!.name,
+                        _isItemSelected() ? selectedItem!.name : '',
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(
@@ -136,15 +142,13 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
     List<Widget> gridItems = [];
 
     for (DriveItemData item in itemsData) {
-      Color itemBorderColor;
-      if (selectedItem != null && selectedItem!.name == item.name) {
-        itemBorderColor = Colors.white;
-      } else {
-        itemBorderColor = Colors.grey;
-      }
       gridItems.add(
         GestureDetector(
-          onTap: () => _selectItem(item),
+          onTap: () {
+            setState(() {
+              selectedItem = item;
+            });
+          },
           child: ItemGridTile(
             auth: widget.auth,
             itemData: item,
@@ -169,7 +173,11 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
     for (DriveItemData item in itemsData) {
       listItems.add(
         GestureDetector(
-          onTap: () => _selectItem(item),
+          onTap: () {
+            setState(() {
+              selectedItem = item;
+            });
+          },
           child: ItemListTile(
             auth: widget.auth,
             itemData: item,
@@ -195,8 +203,11 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
     return itemBorderColor;
   }
 
+  bool _isItemSelected() {
+    return selectedItem != null;
+  }
+
   Future<void> _fetchFileList() async {
-    itemsData = [];
     var response = await http.get(
       Uri.https(
         'www.googleapis.com',
@@ -205,20 +216,21 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
       ),
       headers: {'authorization': 'Bearer ${auth?.accessToken}'},
     );
-    var jsonResponse =
-        convert.jsonDecode(response.body) as Map<String, dynamic>;
-    List jsonItemsList = jsonResponse['files'];
+
+    List jsonItemsList =
+        (convert.jsonDecode(response.body) as Map<String, dynamic>)['files'];
     for (Map item in jsonItemsList) {
       itemsData.add(DriveItemData.fromJson(item));
     }
   }
 
   Future<void> _refreshFileList() async {
+    List<DriveItemData> newItemsData = [];
     if (widget.googleSignIn.currentUser == null) {
       GoogleSignInAccount? user = await widget.googleSignIn.signIn();
       auth = await user?.authentication;
     }
-    itemsData.clear();
+
     var response = await http.get(
       Uri.https(
         'www.googleapis.com',
@@ -227,22 +239,53 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
       ),
       headers: {'authorization': 'Bearer ${widget.auth?.accessToken}'},
     );
-    var jsonResponse =
-        convert.jsonDecode(response.body) as Map<String, dynamic>;
-    List jsonItemsList = jsonResponse['files'];
-    for (Map item in jsonItemsList) {
-      itemsData.add(DriveItemData.fromJson(item));
-    }
-    setState(() {});
-  }
+    List jsonItemsList =
+        (convert.jsonDecode(response.body) as Map<String, dynamic>)['files'];
 
-  void _selectItem(DriveItemData item) {
     setState(() {
-      selectedItem = item;
+      for (Map item in jsonItemsList) {
+        DriveItemData? oldItem = _findAlreadyCreatedItem(item);
+        if (oldItem != null) {
+          newItemsData.add(oldItem);
+        } else {
+          newItemsData.add(DriveItemData.fromJson(item));
+        }
+      }
+      itemsData = newItemsData;
     });
   }
 
-  bool _isItemSelected() {
-    return selectedItem == null;
+  DriveItemData? _findAlreadyCreatedItem(Map item) {
+    for (DriveItemData itemData in itemsData) {
+      if (itemData.id == item['id']) {
+        return itemData;
+      }
+    }
+
+    return null;
+  }
+
+  Future<void> _deleteSelectedFile() async {
+    String fileId = selectedItem!.id;
+    setState(() {
+      selectedItem = null;
+    });
+
+    await http.delete(
+      Uri.https(
+        'www.googleapis.com',
+        '/drive/v3/files/' + fileId,
+      ),
+      headers: {'authorization': 'Bearer ${widget.auth?.accessToken}'},
+    );
+
+    _refreshFileList();
+  }
+
+  Future<void> _downloadSelectedFile() async {
+    String fileId = selectedItem!.id;
+    setState(() {
+      selectedItem = null;
+    });
   }
 }
