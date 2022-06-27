@@ -6,6 +6,7 @@ import 'package:firebase_flutter_project/pages/file_view_page/widgets/user_greet
 import 'package:firebase_flutter_project/util/drive_item_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
@@ -28,6 +29,7 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
   DriveItemData? selectedItem;
   List<DriveItemData> itemsData = [];
   bool isGridView = true;
+  bool isOnDownload = false;
   final IconData listIcon = Icons.grid_view_rounded;
   final IconData gridIcon = Icons.list_rounded;
 
@@ -75,44 +77,46 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                      onPressed: _isItemSelected()
-                          ? () => _deleteSelectedFile()
-                          : null,
-                      icon: Icon(
-                        Icons.delete_rounded,
-                        color: _isItemSelected()
-                            ? Colors.grey.shade400
-                            : Colors.transparent,
+                isOnDownload
+                    ? const Expanded(child: LinearProgressIndicator())
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          IconButton(
+                            onPressed: _isItemSelected()
+                                ? () => _deleteSelectedFile()
+                                : null,
+                            icon: Icon(
+                              Icons.delete_rounded,
+                              color: _isItemSelected()
+                                  ? Colors.grey.shade400
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: _isItemSelected()
+                                ? () => _downloadSelectedFile()
+                                : null,
+                            icon: Icon(
+                              Icons.download_rounded,
+                              color: _isItemSelected()
+                                  ? Colors.grey.shade400
+                                  : Colors.transparent,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 150,
+                            child: Text(
+                              _isItemSelected() ? selectedItem!.name : '',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    IconButton(
-                      onPressed: _isItemSelected()
-                          ? () => _downloadSelectedFile()
-                          : null,
-                      icon: Icon(
-                        Icons.cloud_download_rounded,
-                        color: _isItemSelected()
-                            ? Colors.grey.shade400
-                            : Colors.transparent,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 150,
-                      child: Text(
-                        _isItemSelected() ? selectedItem!.name : '',
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(
-                          color: Colors.grey.shade400,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
                 IconButton(
                   onPressed: () {
                     setState(() {
@@ -284,8 +288,23 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
 
   Future<void> _downloadSelectedFile() async {
     String fileId = selectedItem!.id;
+    String name = selectedItem!.name;
     setState(() {
       selectedItem = null;
+      isOnDownload = true;
+    });
+    Uri url = Uri.parse(
+      'https://www.googleapis.com/drive/v3/files/$fileId?alt=media',
+    );
+    await Permission.storage.request();
+    File file = File('/storage/emulated/0/Download/$name');
+    final http.Response response = await http.Client().get(
+      url,
+      headers: {'authorization': 'Bearer ${widget.auth?.accessToken}'},
+    );
+    await file.writeAsBytes(response.bodyBytes);
+    setState(() {
+      isOnDownload = false;
     });
   }
 }

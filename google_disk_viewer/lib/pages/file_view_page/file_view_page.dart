@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/downloaded_data_view.dart';
 import 'package:flutter/material.dart';
@@ -74,42 +74,42 @@ class FileViewPage extends StatelessWidget {
   }
 
   Future<void> _uploadFile() async {
-    print('pick file');
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       dialogTitle: 'Choose one file',
     );
     if (result == null) {
       return;
     }
-    print('file picked');
 
-    try {
-      var request = http.MultipartRequest(
-        "POST",
-        Uri.parse(
-          'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
-        ),
-      );
-      print('request');
-      request.headers.addAll({
-        'authorization': 'Bearer ${auth?.accessToken}',
+    final file = File(result.paths.first!);
+    final fileLength = file.lengthSync().toString();
+    String sessionUri;
+
+    Uri uri = Uri.parse(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable');
+    String body = json.encode({'name': result.names.first});
+
+    final initialStreamedRequest = http.StreamedRequest('POST', uri)
+      ..headers.addAll({
+        'Authorization': 'Bearer ${auth?.accessToken}',
+        'Content-Length': utf8.encode(body).length.toString(),
+        'Content-Type': 'application/json; charset=UTF-8',
+        'X-Upload-Content-Length': fileLength
       });
-      request.files.add(await http.MultipartFile.fromPath(
-        'package',
-        '${result.paths.first}',
-        contentType: MediaType('application', 'json'), //TO DO
-      ));
-      request.send().then((response) async {
-        print('request send');
-        if (response.statusCode == 200) {
-          print("Uploaded!");
-        } else {
-          print(response.statusCode);
-          print(await response.stream.bytesToString());
-        }
+
+    initialStreamedRequest.sink.add(utf8.encode(body));
+    initialStreamedRequest.sink.close();
+    http.StreamedResponse response = await initialStreamedRequest.send();
+
+    sessionUri = response.headers['location']!;
+    Uri sessionURI = Uri.parse(sessionUri);
+    final fileStreamedRequest = http.StreamedRequest('PUT', sessionURI)
+      ..headers.addAll({
+        'Content-Length': fileLength,
       });
-    } catch (e) {
-      print(e);
-    }
+
+    fileStreamedRequest.sink.add(file.readAsBytesSync());
+    fileStreamedRequest.sink.close();
+    await fileStreamedRequest.send();
   }
 }
