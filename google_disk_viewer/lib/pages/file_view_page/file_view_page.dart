@@ -1,26 +1,35 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_flutter_project/pages/file_view_page/widgets/downloaded_data_view.dart';
+import 'package:firebase_flutter_project/pages/file_view_page/widgets/data_view.dart';
+import 'package:firebase_flutter_project/pages/file_view_page/widgets/user_greeting_view.dart';
+import 'package:firebase_flutter_project/util/drive_item_data.dart';
+import 'package:firebase_flutter_project/util/file_view_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
+import 'dart:convert' as convert;
 
-class FileViewPage extends StatelessWidget {
+class FileViewPage extends StatefulWidget {
   final GoogleSignIn googleSignIn;
-  final GoogleSignInAuthentication? auth;
+  final IconData listIcon = Icons.grid_view_rounded;
+  final IconData gridIcon = Icons.list_rounded;
 
   const FileViewPage({
     Key? key,
     required this.googleSignIn,
-    required this.auth,
   }) : super(key: key);
 
   @override
+  State<FileViewPage> createState() => _FileViewPageState();
+}
+
+class _FileViewPageState extends State<FileViewPage> {
+  FileViewData data = FileViewData();
+
+  @override
   Widget build(BuildContext context) {
-    final GoogleSignInAccount user = googleSignIn.currentUser!;
+    final GoogleSignInAccount user = widget.googleSignIn.currentUser!;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade700,
@@ -46,8 +55,9 @@ class FileViewPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              googleSignIn.signOut().then((value) => Navigator.pop(context));
+            onPressed: () async {
+              await widget.googleSignIn.signOut();
+              Navigator.pop(context);
             },
             icon: Icon(
               Icons.exit_to_app_rounded,
@@ -57,27 +67,116 @@ class FileViewPage extends StatelessWidget {
           ),
         ],
       ),
-      body: DownloadedDataView(
-        auth: auth,
-        googleSignIn: googleSignIn,
-      ),
+      body: data.itemsData.isEmpty
+          ? FutureBuilder(
+              future: _fetchFileList(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return _buildDataView();
+                } else {
+                  return UserGreetingView(
+                    googleSignIn: widget.googleSignIn,
+                  );
+                }
+              },
+            )
+          : _buildDataView(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _uploadFile,
+        onPressed: data.isUploading ? null : _uploadFile,
         backgroundColor: Colors.grey,
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 42,
-        ),
+        child: data.isUploading
+            ? const CircularProgressIndicator()
+            : const Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 42,
+              ),
       ),
     );
   }
 
+  Future<void> _fetchFileList() async {
+    data.auth = await widget.googleSignIn.currentUser?.authentication;
+    var response = await http.get(
+      Uri.https(
+        'www.googleapis.com',
+        '/drive/v3/files',
+        {'fields': 'files(id,iconLink,name,createdTime,size,thumbnailLink)'},
+      ),
+      headers: {'authorization': 'Bearer ${data.auth?.accessToken}'},
+    );
+
+    List jsonItemsList =
+        (convert.jsonDecode(response.body) as Map<String, dynamic>)['files'];
+    for (Map item in jsonItemsList) {
+      data.itemsData.add(DriveItemData.fromJson(item));
+    }
+  }
+
+  Future<void> _refreshFileList() async {
+    List<DriveItemData> newItemsData = [];
+
+    if (widget.googleSignIn.currentUser == null) {
+      await widget.googleSignIn.signInSilently(reAuthenticate: true);
+      data.auth = await widget.googleSignIn.currentUser?.authentication;
+    }
+
+    var response = await http.get(
+      Uri.https(
+        'www.googleapis.com',
+        '/drive/v3/files',
+        {'fields': 'files(id,iconLink,name,createdTime,size,thumbnailLink)'},
+      ),
+      headers: {'authorization': 'Bearer ${data.auth?.accessToken}'},
+    );
+
+    List jsonItemsList =
+        (convert.jsonDecode(response.body) as Map<String, dynamic>)['files'];
+    for (Map item in jsonItemsList) {
+      DriveItemData? oldItem = _findAlreadyCreatedItem(item);
+      if (oldItem != null) {
+        newItemsData.add(oldItem);
+      } else {
+        newItemsData.add(DriveItemData.fromJson(item));
+      }
+    }
+
+    setState(() {
+      data.itemsData = newItemsData;
+    });
+  }
+
+  DriveItemData? _findAlreadyCreatedItem(Map item) {
+    for (DriveItemData itemData in data.itemsData) {
+      if (itemData.id == item['id']) {
+        return itemData;
+      }
+    }
+
+    return null;
+  }
+
+  Widget _buildDataView() {
+    return DataView(
+      data: data,
+      setState: () => setState(() {}),
+      googleSignIn: widget.googleSignIn,
+      refreshFileList: _refreshFileList,
+    );
+  }
+
   Future<void> _uploadFile() async {
+    setState(() {
+      data.isUploading = true;
+    });
+
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       dialogTitle: 'Choose one file',
     );
     if (result == null) {
+      setState(() {
+        data.isUploading = false;
+      });
       return;
     }
 
@@ -88,10 +187,9 @@ class FileViewPage extends StatelessWidget {
     Uri uri = Uri.parse(
         'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable');
     String body = json.encode({'name': result.names.first});
-
     final initialStreamedRequest = http.StreamedRequest('POST', uri)
       ..headers.addAll({
-        'Authorization': 'Bearer ${auth?.accessToken}',
+        'Authorization': 'Bearer ${data.auth?.accessToken}',
         'Content-Length': utf8.encode(body).length.toString(),
         'Content-Type': 'application/json; charset=UTF-8',
         'X-Upload-Content-Length': fileLength
@@ -111,5 +209,8 @@ class FileViewPage extends StatelessWidget {
     fileStreamedRequest.sink.add(file.readAsBytesSync());
     fileStreamedRequest.sink.close();
     await fileStreamedRequest.send();
+
+    data.isUploading = false;
+    _refreshFileList();
   }
 }

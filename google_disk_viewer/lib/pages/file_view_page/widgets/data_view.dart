@@ -2,66 +2,36 @@ import 'dart:io';
 
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/item_grid_tile.dart';
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/item_list_tile.dart';
-import 'package:firebase_flutter_project/pages/file_view_page/widgets/user_greeting_view.dart';
 import 'package:firebase_flutter_project/util/drive_item_data.dart';
+import 'package:firebase_flutter_project/util/file_view_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 
-class DownloadedDataView extends StatefulWidget {
-  final GoogleSignInAuthentication? auth;
+class DataView extends StatelessWidget {
+  final FileViewData data;
+  final VoidCallback setState;
   final GoogleSignIn googleSignIn;
-
-  const DownloadedDataView({
-    Key? key,
-    required this.auth,
-    required this.googleSignIn,
-  }) : super(key: key);
-
-  @override
-  State<DownloadedDataView> createState() => _DownloadedDataViewState();
-}
-
-class _DownloadedDataViewState extends State<DownloadedDataView> {
-  GoogleSignInAuthentication? auth;
-  DriveItemData? selectedItem;
-  List<DriveItemData> itemsData = [];
-  bool isGridView = true;
-  bool isOnDownload = false;
+  final Future<void> Function() refreshFileList;
   final IconData listIcon = Icons.grid_view_rounded;
   final IconData gridIcon = Icons.list_rounded;
 
-  @override
-  void initState() {
-    auth = widget.auth;
-    super.initState();
-  }
+  const DataView({
+    Key? key,
+    required this.data,
+    required this.setState,
+    required this.googleSignIn,
+    required this.refreshFileList,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return itemsData.isEmpty
-        ? FutureBuilder(
-            future: _fetchFileList(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return _buildDataView();
-              } else {
-                return UserGreetingView(
-                  googleSignIn: widget.googleSignIn,
-                );
-              }
-            },
-          )
-        : _buildDataView();
-  }
-
-  Widget _buildDataView() {
     return GestureDetector(
-      onTap: () => setState(() {
-        selectedItem = null;
-      }),
+      onTap: () {
+        data.selectedItem = null;
+        setState();
+      },
       child: Column(
         children: [
           DecoratedBox(
@@ -77,8 +47,24 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                isOnDownload
-                    ? const Expanded(child: LinearProgressIndicator())
+                data.isOnDownload
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: SizedBox(
+                          width: 250,
+                          child: Column(
+                            children: [
+                              const LinearProgressIndicator(),
+                              Text(
+                                'Downloading...',
+                                style: TextStyle(
+                                  color: Colors.grey.shade400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -107,7 +93,7 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
                           SizedBox(
                             width: 150,
                             child: Text(
-                              _isItemSelected() ? selectedItem!.name : '',
+                              _isItemSelected() ? data.selectedItem!.name : '',
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
@@ -119,12 +105,11 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
                       ),
                 IconButton(
                   onPressed: () {
-                    setState(() {
-                      isGridView = !isGridView;
-                    });
+                    data.isGridView = !data.isGridView;
+                    setState();
                   },
                   icon: Icon(
-                    isGridView ? gridIcon : listIcon,
+                    data.isGridView ? gridIcon : listIcon,
                     color: Colors.grey.shade400,
                   ),
                 ),
@@ -133,8 +118,8 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
           ),
           Expanded(
             child: RefreshIndicator(
-              child: isGridView ? _buildGridView() : _buildListView(),
-              onRefresh: _refreshFileList,
+              child: data.isGridView ? _buildGridView() : _buildListView(),
+              onRefresh: refreshFileList,
             ),
           ),
         ],
@@ -145,16 +130,15 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
   Widget _buildGridView() {
     List<Widget> gridItems = [];
 
-    for (DriveItemData item in itemsData) {
+    for (DriveItemData item in data.itemsData) {
       gridItems.add(
         GestureDetector(
           onTap: () {
-            setState(() {
-              selectedItem = item;
-            });
+            data.selectedItem = item;
+            setState();
           },
           child: ItemGridTile(
-            auth: widget.auth,
+            auth: data.auth,
             itemData: item,
             borderColor: _selectColorForItem(item),
           ),
@@ -174,16 +158,15 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
   Widget _buildListView() {
     List<Widget> listItems = [];
 
-    for (DriveItemData item in itemsData) {
+    for (DriveItemData item in data.itemsData) {
       listItems.add(
         GestureDetector(
           onTap: () {
-            setState(() {
-              selectedItem = item;
-            });
+            data.selectedItem = item;
+            setState();
           },
           child: ItemListTile(
-            auth: widget.auth,
+            auth: data.auth,
             itemData: item,
             borderColor: _selectColorForItem(item),
           ),
@@ -199,7 +182,7 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
 
   Color _selectColorForItem(DriveItemData item) {
     Color itemBorderColor;
-    if (selectedItem != null && selectedItem!.name == item.name) {
+    if (data.selectedItem != null && data.selectedItem!.name == item.name) {
       itemBorderColor = Colors.white;
     } else {
       itemBorderColor = Colors.grey;
@@ -208,91 +191,33 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
   }
 
   bool _isItemSelected() {
-    return selectedItem != null;
-  }
-
-  Future<void> _fetchFileList() async {
-    var response = await http.get(
-      Uri.https(
-        'www.googleapis.com',
-        '/drive/v3/files',
-        {'fields': 'files(id,iconLink,name,createdTime,size,thumbnailLink)'},
-      ),
-      headers: {'authorization': 'Bearer ${auth?.accessToken}'},
-    );
-
-    List jsonItemsList =
-        (convert.jsonDecode(response.body) as Map<String, dynamic>)['files'];
-    for (Map item in jsonItemsList) {
-      itemsData.add(DriveItemData.fromJson(item));
-    }
-  }
-
-  Future<void> _refreshFileList() async {
-    List<DriveItemData> newItemsData = [];
-    if (widget.googleSignIn.currentUser == null) {
-      GoogleSignInAccount? user = await widget.googleSignIn.signIn();
-      auth = await user?.authentication;
-    }
-
-    var response = await http.get(
-      Uri.https(
-        'www.googleapis.com',
-        '/drive/v3/files',
-        {'fields': 'files(id,iconLink,name,createdTime,size,thumbnailLink)'},
-      ),
-      headers: {'authorization': 'Bearer ${widget.auth?.accessToken}'},
-    );
-    List jsonItemsList =
-        (convert.jsonDecode(response.body) as Map<String, dynamic>)['files'];
-
-    setState(() {
-      for (Map item in jsonItemsList) {
-        DriveItemData? oldItem = _findAlreadyCreatedItem(item);
-        if (oldItem != null) {
-          newItemsData.add(oldItem);
-        } else {
-          newItemsData.add(DriveItemData.fromJson(item));
-        }
-      }
-      itemsData = newItemsData;
-    });
-  }
-
-  DriveItemData? _findAlreadyCreatedItem(Map item) {
-    for (DriveItemData itemData in itemsData) {
-      if (itemData.id == item['id']) {
-        return itemData;
-      }
-    }
-
-    return null;
+    return data.selectedItem != null;
   }
 
   Future<void> _deleteSelectedFile() async {
-    String fileId = selectedItem!.id;
-    setState(() {
-      selectedItem = null;
-    });
+    String fileId = data.selectedItem!.id;
+    data.selectedItem = null;
+    setState();
 
     await http.delete(
       Uri.https(
         'www.googleapis.com',
         '/drive/v3/files/' + fileId,
       ),
-      headers: {'authorization': 'Bearer ${widget.auth?.accessToken}'},
+      headers: {'authorization': 'Bearer ${data.auth?.accessToken}'},
     );
 
-    _refreshFileList();
+    refreshFileList();
   }
 
   Future<void> _downloadSelectedFile() async {
-    String fileId = selectedItem!.id;
-    String name = selectedItem!.name;
-    setState(() {
-      selectedItem = null;
-      isOnDownload = true;
-    });
+    String fileId = data.selectedItem!.id;
+    String name = data.selectedItem!.name;
+
+    data.selectedItem = null;
+    data.isOnDownload = true;
+    setState();
+
     Uri url = Uri.parse(
       'https://www.googleapis.com/drive/v3/files/$fileId?alt=media',
     );
@@ -300,11 +225,11 @@ class _DownloadedDataViewState extends State<DownloadedDataView> {
     File file = File('/storage/emulated/0/Download/$name');
     final http.Response response = await http.Client().get(
       url,
-      headers: {'authorization': 'Bearer ${widget.auth?.accessToken}'},
+      headers: {'authorization': 'Bearer ${data.auth?.accessToken}'},
     );
     await file.writeAsBytes(response.bodyBytes);
-    setState(() {
-      isOnDownload = false;
-    });
+
+    data.isOnDownload = false;
+    setState();
   }
 }

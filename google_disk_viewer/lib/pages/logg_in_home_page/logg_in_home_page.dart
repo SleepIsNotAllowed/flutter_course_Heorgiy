@@ -23,8 +23,6 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
     DriveApi.driveMetadataScope,
     DriveApi.drivePhotosReadonlyScope,
   ]);
-  GoogleSignInAccount? user;
-  GoogleSignInAuthentication? auth;
   bool isInProgress = false;
 
   @override
@@ -82,20 +80,18 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
                           setState(() {
                             isInProgress = true;
                           });
-                          loggInGoogle().then(
-                            (value) => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FileViewPage(
-                                  googleSignIn: googleSignIn,
-                                  auth: auth,
-                                ),
+                          await googleSignIn.signIn();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FileViewPage(
+                                googleSignIn: googleSignIn,
                               ),
-                            ).then(
-                              (value) => setState(() {
-                                isInProgress = false;
-                              }),
                             ),
+                          ).then(
+                            (value) => setState(() {
+                              isInProgress = false;
+                            }),
                           );
                         },
                         icon: const FaIcon(
@@ -103,7 +99,9 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
                           color: Colors.blue,
                         ),
                         label: Text(
-                          user == null ? 'Sign In with Google' : 'Continue',
+                          googleSignIn.currentUser == null
+                              ? 'Sign In with Google'
+                              : 'Continue',
                           style: const TextStyle(
                             fontSize: 16,
                           ),
@@ -115,10 +113,5 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
         ),
       ),
     );
-  }
-
-  Future<void> loggInGoogle() async {
-    user = await googleSignIn.signIn();
-    auth = await user?.authentication;
   }
 }
