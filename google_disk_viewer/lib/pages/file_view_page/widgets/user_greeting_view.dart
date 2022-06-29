@@ -17,7 +17,7 @@ class UserGreetingView extends StatelessWidget {
       child: Container(
         width: 320,
         height: 280,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [

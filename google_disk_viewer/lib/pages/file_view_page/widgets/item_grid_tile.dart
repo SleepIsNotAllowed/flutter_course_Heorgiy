@@ -1,3 +1,4 @@
+import 'package:firebase_flutter_project/util/colors.dart';
 import 'package:firebase_flutter_project/util/drive_item_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -20,7 +21,7 @@ class ItemGridTile extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(color: borderColor),
         borderRadius: const BorderRadius.all(Radius.circular(16)),
-        color: Colors.grey.shade800,
+        color: AppColors.backgroundSecondary,
       ),
       child: Column(
         children: [

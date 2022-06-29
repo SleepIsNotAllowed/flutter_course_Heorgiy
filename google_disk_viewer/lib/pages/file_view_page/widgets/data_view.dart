@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/item_grid_tile.dart';
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/item_list_tile.dart';
+import 'package:firebase_flutter_project/util/colors.dart';
 import 'package:firebase_flutter_project/util/drive_item_data.dart';
 import 'package:firebase_flutter_project/util/file_view_data.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,7 @@ class DataView extends StatelessWidget {
                   width: 2,
                 ),
               ),
-              color: Colors.grey.shade800,
+              color: AppColors.backgroundSecondary,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,7 +76,7 @@ class DataView extends StatelessWidget {
                             icon: Icon(
                               Icons.delete_rounded,
                               color: _isItemSelected()
-                                  ? Colors.grey.shade400
+                                  ? AppColors.iconsMain
                                   : Colors.transparent,
                             ),
                           ),
@@ -86,7 +87,7 @@ class DataView extends StatelessWidget {
                             icon: Icon(
                               Icons.download_rounded,
                               color: _isItemSelected()
-                                  ? Colors.grey.shade400
+                                  ? AppColors.iconsMain
                                   : Colors.transparent,
                             ),
                           ),
@@ -110,7 +111,7 @@ class DataView extends StatelessWidget {
                   },
                   icon: Icon(
                     data.isGridView ? gridIcon : listIcon,
-                    color: Colors.grey.shade400,
+                    color: AppColors.iconsMain,
                   ),
                 ),
               ],

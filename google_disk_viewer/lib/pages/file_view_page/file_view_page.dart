@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/data_view.dart';
 import 'package:firebase_flutter_project/pages/file_view_page/widgets/user_greeting_view.dart';
+import 'package:firebase_flutter_project/util/colors.dart';
 import 'package:firebase_flutter_project/util/drive_item_data.dart';
 import 'package:firebase_flutter_project/util/file_view_data.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +13,6 @@ import 'dart:convert' as convert;
 
 class FileViewPage extends StatefulWidget {
   final GoogleSignIn googleSignIn;
-  final IconData listIcon = Icons.grid_view_rounded;
-  final IconData gridIcon = Icons.list_rounded;
 
   const FileViewPage({
     Key? key,
@@ -32,13 +31,13 @@ class _FileViewPageState extends State<FileViewPage> {
     final GoogleSignInAccount user = widget.googleSignIn.currentUser!;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade700,
+      backgroundColor: AppColors.backgroundMain,
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade900,
+        backgroundColor: AppColors.appBarMain,
         leading: Container(
           width: 30,
           height: 30,
-          margin: const EdgeInsets.all(10),
+          margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             image: DecorationImage(
@@ -61,7 +60,7 @@ class _FileViewPageState extends State<FileViewPage> {
             },
             icon: Icon(
               Icons.exit_to_app_rounded,
-              color: Colors.grey.shade400,
+              color: AppColors.iconsMain,
             ),
             tooltip: "Logg out",
           ),
