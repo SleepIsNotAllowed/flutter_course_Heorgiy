@@ -6,14 +6,13 @@ import 'package:firebase_flutter_project/util/colors.dart';
 import 'package:firebase_flutter_project/util/drive_item_data.dart';
 import 'package:firebase_flutter_project/util/file_view_data.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 
 class DataView extends StatelessWidget {
   final FileViewData data;
   final VoidCallback setState;
-  final GoogleSignIn googleSignIn;
   final Future<void> Function() refreshFileList;
   final IconData listIcon = Icons.grid_view_rounded;
   final IconData gridIcon = Icons.list_rounded;
@@ -22,7 +21,6 @@ class DataView extends StatelessWidget {
     Key? key,
     required this.data,
     required this.setState,
-    required this.googleSignIn,
     required this.refreshFileList,
   }) : super(key: key);
 
@@ -219,11 +217,13 @@ class DataView extends StatelessWidget {
     data.isOnDownload = true;
     setState();
 
+    await Permission.storage.request();
+    if (data.downloadPath == null) await _defineDownloadPath();
+    File file = File('${data.downloadPath}/$name');
+
     Uri url = Uri.parse(
       'https://www.googleapis.com/drive/v3/files/$fileId?alt=media',
     );
-    await Permission.storage.request();
-    File file = File('/storage/emulated/0/Download/$name');
     final http.Response response = await http.Client().get(
       url,
       headers: {'authorization': 'Bearer ${data.auth?.accessToken}'},
@@ -232,5 +232,12 @@ class DataView extends StatelessWidget {
 
     data.isOnDownload = false;
     setState();
+  }
+
+  Future<void> _defineDownloadPath() async {
+    Directory? externalStorage = await getExternalStorageDirectory();
+    Directory appStorage = await getApplicationDocumentsDirectory();
+    data.downloadPath =
+        externalStorage == null ? appStorage.path : externalStorage.path;
   }
 }

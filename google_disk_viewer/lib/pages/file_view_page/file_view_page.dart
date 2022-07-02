@@ -13,7 +13,6 @@ import 'dart:convert' as convert;
 
 class FileViewPage extends StatefulWidget {
   final GoogleSignIn googleSignIn;
-
   const FileViewPage({
     Key? key,
     required this.googleSignIn,
@@ -28,7 +27,7 @@ class _FileViewPageState extends State<FileViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    final GoogleSignInAccount user = widget.googleSignIn.currentUser!;
+    final GoogleSignInAccount? user = widget.googleSignIn.currentUser;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundMain,
@@ -41,7 +40,7 @@ class _FileViewPageState extends State<FileViewPage> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             image: DecorationImage(
-              image: NetworkImage(user.photoUrl!),
+              image: NetworkImage(user!.photoUrl!),
             ),
             border: Border.all(color: Colors.grey),
           ),
@@ -159,7 +158,6 @@ class _FileViewPageState extends State<FileViewPage> {
     return DataView(
       data: data,
       setState: () => setState(() {}),
-      googleSignIn: widget.googleSignIn,
       refreshFileList: _refreshFileList,
     );
   }
@@ -181,7 +179,6 @@ class _FileViewPageState extends State<FileViewPage> {
 
     final file = File(result.paths.first!);
     final fileLength = file.lengthSync().toString();
-    String sessionUri;
 
     Uri uri = Uri.parse(
         'https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable');
@@ -198,7 +195,7 @@ class _FileViewPageState extends State<FileViewPage> {
     initialStreamedRequest.sink.close();
     http.StreamedResponse response = await initialStreamedRequest.send();
 
-    sessionUri = response.headers['location']!;
+    String sessionUri = response.headers['location']!;
     Uri sessionURI = Uri.parse(sessionUri);
     final fileStreamedRequest = http.StreamedRequest('PUT', sessionURI)
       ..headers.addAll({

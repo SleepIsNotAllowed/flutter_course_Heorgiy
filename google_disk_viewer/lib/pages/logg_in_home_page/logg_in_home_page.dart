@@ -14,6 +14,7 @@ class LoggInHomePage extends StatefulWidget {
 }
 
 class _LoggInHomePageState extends State<LoggInHomePage> {
+  bool isInProgress = false;
   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: [
     DriveApi.driveScope,
     DriveApi.driveFileScope,
@@ -23,10 +24,10 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
     DriveApi.driveMetadataScope,
     DriveApi.drivePhotosReadonlyScope,
   ]);
-  bool isInProgress = false;
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
@@ -76,24 +77,7 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
                           onPrimary: Colors.black54,
                           minimumSize: const Size(200, 50),
                         ),
-                        onPressed: () async {
-                          setState(() {
-                            isInProgress = true;
-                          });
-                          await googleSignIn.signIn();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FileViewPage(
-                                googleSignIn: googleSignIn,
-                              ),
-                            ),
-                          ).then(
-                            (value) => setState(() {
-                              isInProgress = false;
-                            }),
-                          );
-                        },
+                        onPressed: _authenticateUser,
                         icon: const FaIcon(
                           FontAwesomeIcons.google,
                           color: Colors.blue,
@@ -113,5 +97,33 @@ class _LoggInHomePageState extends State<LoggInHomePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _authenticateUser() async {
+    setState(() {
+      isInProgress = true;
+    });
+    if (googleSignIn.currentUser == null) {
+      await googleSignIn.signIn();
+    }
+
+    if (googleSignIn.currentUser != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FileViewPage(
+            googleSignIn: googleSignIn,
+          ),
+        ),
+      ).then(
+        (value) => setState(() {
+          isInProgress = false;
+        }),
+      );
+    } else {
+      setState(() {
+        isInProgress = false;
+      });
+    }
   }
 }
