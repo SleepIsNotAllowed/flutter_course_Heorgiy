@@ -1,4 +1,3 @@
-import 'package:firebase_messenger/authorization_page/auth_page.dart';
 import 'package:firebase_messenger/users_and_chats_page/users_and_chats_bloc.dart';
 import 'package:firebase_messenger/users_and_chats_page/widgets/bottom_bar.dart';
 import 'package:firebase_messenger/users_and_chats_page/widgets/chats_list_view.dart';
