@@ -74,7 +74,7 @@ class AuthorizedWidget extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                 ),
-                onPressed: () => bloc.add(AuthSignOut()),
+                onPressed: () => bloc.add(UserSignOut()),
                 child: const Text('Sign Out'),
               ),
             ],

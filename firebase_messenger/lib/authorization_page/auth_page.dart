@@ -8,23 +8,20 @@ class AuthPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(),
-        ),
-      ],
+    return BlocProvider<AuthBloc>(
+      create: (context) => AuthBloc(),
       child: Container(
         decoration: BoxDecoration(
-            gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.purple.shade800,
-            Colors.deepPurple,
-            Colors.blue.shade800,
-          ],
-        )),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.purple.shade800,
+              Colors.deepPurple,
+              Colors.blue.shade800,
+            ],
+          ),
+        ),
         child: Scaffold(
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(

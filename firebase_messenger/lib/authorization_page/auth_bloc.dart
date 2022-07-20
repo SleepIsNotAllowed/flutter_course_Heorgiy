@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:firebase_messenger/networking/firebase_auth_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,7 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   AuthBloc() : super(const AuthState()) {
-    on<AuthSignIn>((event, emit) async {
+    on<UserSignIn>((event, emit) async {
       if (!formKey.currentState!.validate()) return;
       emit(state.copyWith(
         emailErrorMessage: null,
@@ -42,7 +44,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    on<AuthSignUp>((event, emit) async {
+    on<UserSignUp>((event, emit) async {
       if (!formKey.currentState!.validate()) return;
       emit(state.copyWith(
         emailErrorMessage: null,
@@ -53,6 +55,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emailController.text,
         passwordController.text,
         nameController.text,
+        Random().nextInt(Colors.primaries.length),
       );
       if (result == null) {
         emit(state.copyWith(authStatus: AuthStatus.signIn));
@@ -66,13 +69,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    on<AuthSignOut>((event, emit) async {
+    on<UserSignOut>((event, emit) async {
       emit(state.copyWith(authStatus: AuthStatus.loading));
       await authClient.signOut();
       emit(state.copyWith(authStatus: AuthStatus.signIn));
     });
 
-    on<AuthCreateAccount>((event, emit) {
+    on<SignInOrSighUpToggle>((event, emit) {
       emailController.clear();
       passwordController.clear();
       nameController.clear();

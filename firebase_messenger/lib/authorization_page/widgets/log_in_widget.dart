@@ -39,7 +39,7 @@ class SignInWidget extends StatelessWidget {
               validator: passwordValidation,
             ),
             ElevatedButton(
-              onPressed: () => bloc.add(AuthSignIn()),
+              onPressed: () => bloc.add(UserSignIn()),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurple,
               ),
@@ -62,7 +62,7 @@ class SignInWidget extends StatelessWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () => bloc.add(AuthCreateAccount()),
+                  onTap: () => bloc.add(SignInOrSighUpToggle()),
                   child: const Text(
                     'Sign Up',
                     style: TextStyle(

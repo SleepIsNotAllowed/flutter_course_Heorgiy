@@ -8,9 +8,12 @@ class BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<UsersAndChatsBloc, UsersAndChatsState>(
+      buildWhen: (prevState, newState) {
+        return prevState.navigationIndex != newState.navigationIndex;
+      },
       builder: (context, state) {
         return BottomNavigationBar(
-          currentIndex: 0,
+          currentIndex: state.navigationIndex ?? 0,
           items: const [
             BottomNavigationBarItem(
               label: 'Contacts',
@@ -21,12 +24,12 @@ class BottomBar extends StatelessWidget {
               icon: Icon(Icons.chat_outlined),
             ),
           ],
-          selectedItemColor: Colors.deepPurple,
-          selectedLabelStyle: const TextStyle(color: Colors.deepPurple),
+          selectedItemColor: Colors.deepPurpleAccent,
+          selectedLabelStyle: const TextStyle(color: Colors.deepPurpleAccent),
           backgroundColor: Colors.grey.shade200,
-          onTap: (index) => context.read<UsersAndChatsBloc>().add(
-                NavigationChanged(index: index),
-              ),
+          onTap: (index) => context
+              .read<UsersAndChatsBloc>()
+              .add(NavigationChanged(index: index)),
         );
       },
     );

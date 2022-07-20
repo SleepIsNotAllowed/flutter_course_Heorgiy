@@ -30,6 +30,7 @@ class FirebaseAuthClient {
     String email,
     String password,
     String name,
+    int colorIndex,
   ) async {
     try {
       UserCredential credential = await auth.createUserWithEmailAndPassword(
@@ -44,6 +45,7 @@ class FirebaseAuthClient {
         'timestamp': DateTime.now().millisecondsSinceEpoch,
         'name': name,
         'userId': auth.currentUser!.uid,
+        'thumbnailColor': colorIndex,
       });
     } on Exception catch (_) {
       List authMethods = await auth.fetchSignInMethodsForEmail(email);

@@ -3,14 +3,14 @@ part of 'auth_bloc.dart';
 @immutable
 abstract class AuthEvent {}
 
-class AuthSignIn extends AuthEvent {}
+class UserSignIn extends AuthEvent {}
 
-class AuthSignUp extends AuthEvent {}
+class UserSignUp extends AuthEvent {}
 
-class AuthSignOut extends AuthEvent {}
+class UserSignOut extends AuthEvent {}
 
 class AuthForgotPass extends AuthEvent {}
 
-class AuthCreateAccount extends AuthEvent {}
+class SignInOrSighUpToggle extends AuthEvent {}
 
 class AuthExit extends AuthEvent {}
