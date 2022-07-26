@@ -79,7 +79,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emailController.clear();
       passwordController.clear();
       nameController.clear();
-      if (state.authStatus == AuthStatus.signIn) {
+      if (state.authStatus != AuthStatus.signUp) {
         emit(state.copyWith(
           emailErrorMessage: null,
           passwordErrorMessage: null,

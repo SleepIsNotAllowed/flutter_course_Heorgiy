@@ -13,7 +13,7 @@ class BottomBar extends StatelessWidget {
       },
       builder: (context, state) {
         return BottomNavigationBar(
-          currentIndex: state.navigationIndex ?? 0,
+          currentIndex: state.navigationIndex!,
           items: const [
             BottomNavigationBarItem(
               label: 'Contacts',

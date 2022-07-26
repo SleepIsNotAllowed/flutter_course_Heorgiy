@@ -2,21 +2,29 @@ part of 'users_and_chats_bloc.dart';
 
 @immutable
 class UsersAndChatsState {
+  final String? currentUserId;
   final int? navigationIndex;
-  final List<UserContactInfo>? usersData;
+  final List<UserContactInfo>? usersList;
+  final List<ChatInfo>? chatsList;
 
   const UsersAndChatsState({
+    this.currentUserId,
     this.navigationIndex,
-    this.usersData,
+    this.usersList,
+    this.chatsList,
   });
 
   UsersAndChatsState copyWith({
+    String? currentUserId,
     int? navigationIndex,
-    List<UserContactInfo>? usersData,
+    List<UserContactInfo>? usersList,
+    List<ChatInfo>? chatsList,
   }) {
     return UsersAndChatsState(
+      currentUserId: currentUserId ?? this.currentUserId,
       navigationIndex: navigationIndex ?? this.navigationIndex,
-      usersData: usersData ?? this.usersData,
+      usersList: usersList ?? this.usersList,
+      chatsList: chatsList ?? this.chatsList,
     );
   }
 }

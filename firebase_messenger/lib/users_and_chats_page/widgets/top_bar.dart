@@ -9,17 +9,14 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget{
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      toolbarHeight: 40,
       backgroundColor: Colors.grey.shade200,
       actions: [
         IconButton(
           onPressed: () async {
             context.read<UsersAndChatsBloc>().add(UserSignOut());
-            Navigator.pushReplacement(
+            Navigator.pushReplacementNamed(
               context,
-              MaterialPageRoute(
-                builder: (context) => const AuthPage(),
-              ),
+              'auth',
             );
           },
           icon: const Icon(
@@ -32,6 +29,5 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget{
   }
 
   @override
-  // TODO: implement preferredSize
-  Size get preferredSize => const Size.fromHeight(40);
+  Size get preferredSize => const Size.fromHeight(50);
 }

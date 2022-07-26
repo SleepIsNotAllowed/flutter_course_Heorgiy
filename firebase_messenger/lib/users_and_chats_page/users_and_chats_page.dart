@@ -6,15 +6,8 @@ import 'package:firebase_messenger/users_and_chats_page/widgets/users_list_view.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class UsersAndChatsPage extends StatefulWidget {
+class UsersAndChatsPage extends StatelessWidget {
   const UsersAndChatsPage({Key? key}) : super(key: key);
-
-  @override
-  State<UsersAndChatsPage> createState() => _UsersAndChatsPageState();
-}
-
-class _UsersAndChatsPageState extends State<UsersAndChatsPage> {
-  int currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -22,31 +15,31 @@ class _UsersAndChatsPageState extends State<UsersAndChatsPage> {
       create: (context) => UsersAndChatsBloc(),
       child: Container(
         decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.purple.shade800,
-                Colors.deepPurple,
-                Colors.blue.shade800,
-              ],
-            )),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.purple.shade800,
+              Colors.deepPurple,
+              Colors.blue.shade800,
+            ],
+          ),
+        ),
         child: Scaffold(
           backgroundColor: Colors.transparent,
-          appBar: TopBar(),
+          appBar: const TopBar(),
           body: BlocBuilder<UsersAndChatsBloc, UsersAndChatsState>(
             buildWhen: (prevState, newState) {
               return prevState.navigationIndex != newState.navigationIndex;
             },
             builder: (context, state) {
-              return (state.navigationIndex == 0 ||
-                  state.navigationIndex == null)
+              return state.navigationIndex == 0
                   ? UsersListView(
-                bloc: context.read<UsersAndChatsBloc>(),
-              )
+                      bloc: context.read<UsersAndChatsBloc>(),
+                    )
                   : ChatsListView(
-                bloc: context.read<UsersAndChatsBloc>(),
-              );
+                      bloc: context.read<UsersAndChatsBloc>(),
+                    );
             },
           ),
           bottomNavigationBar: const BottomBar(),

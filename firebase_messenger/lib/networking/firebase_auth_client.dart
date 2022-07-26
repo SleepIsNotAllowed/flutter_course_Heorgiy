@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messenger/networking/firestore_client.dart';
 
 class FirebaseAuthClient {
   final FirebaseAuth auth = FirebaseAuth.instance;
+  static FirestoreClient firestore = FirestoreClient();
 
   Future<String?> signInWithEmailAndPassword(
     String email,
@@ -38,15 +39,7 @@ class FirebaseAuthClient {
         password: password,
       );
       await credential.user!.updateDisplayName(name);
-      await FirebaseFirestore.instance
-          .collection('usersList')
-          .doc(auth.currentUser!.uid)
-          .set(<String, dynamic>{
-        'timestamp': DateTime.now().millisecondsSinceEpoch,
-        'name': name,
-        'userId': auth.currentUser!.uid,
-        'thumbnailColor': colorIndex,
-      });
+      await firestore.createUserRecord(name, colorIndex);
     } on Exception catch (_) {
       List authMethods = await auth.fetchSignInMethodsForEmail(email);
       if (authMethods.contains('password')) {

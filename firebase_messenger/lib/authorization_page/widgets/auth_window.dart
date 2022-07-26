@@ -1,5 +1,4 @@
 import 'package:firebase_messenger/authorization_page/auth_bloc.dart';
-import 'package:firebase_messenger/authorization_page/widgets/authorized_widget.dart';
 import 'package:firebase_messenger/authorization_page/widgets/error_message_widget.dart';
 import 'package:firebase_messenger/authorization_page/widgets/log_in_widget.dart';
 import 'package:firebase_messenger/authorization_page/widgets/sign_up_widget.dart';
@@ -24,17 +23,13 @@ class AuthWindow extends StatelessWidget {
           builder: (context, state) {
             AuthBloc bloc = context.read<AuthBloc>();
             AuthStatus authStatus = state.authStatus;
-            if (authStatus == AuthStatus.signIn) {
+            if (authStatus == AuthStatus.signIn ||
+                authStatus == AuthStatus.authorized) {
               return SignInWidget(bloc: bloc);
             } else if (authStatus == AuthStatus.signUp) {
               return SignUpWidget(bloc: bloc);
             } else if (authStatus == AuthStatus.loading) {
-              return const CircularProgressIndicator(
-                color: Colors.deepPurple,
-                strokeWidth: 8,
-              );
-            } else if (authStatus == AuthStatus.authorized) {
-              return AuthorizedWidget(bloc: bloc);
+              return _buildProgressIndicator();
             } else if (authStatus == AuthStatus.unexpectedError) {
               return ErrorMessageWidget(bloc: bloc, state: state);
             }
@@ -42,6 +37,13 @@ class AuthWindow extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildProgressIndicator() {
+    return const CircularProgressIndicator(
+      color: Colors.deepPurple,
+      strokeWidth: 8,
     );
   }
 }

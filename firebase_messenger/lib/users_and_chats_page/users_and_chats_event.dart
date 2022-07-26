@@ -12,7 +12,13 @@ class NavigationChanged extends UsersAndChatsEvent {
 class UserSignOut extends UsersAndChatsEvent {}
 
 class RefreshUsersList extends UsersAndChatsEvent {
-  final List<UserContactInfo> usersInfo;
+  final List<UserContactInfo> usersList;
 
-  RefreshUsersList({required this.usersInfo});
+  RefreshUsersList({required this.usersList});
+}
+
+class RefreshChatsList extends UsersAndChatsEvent {
+  final List<ChatInfo> chatsList;
+
+  RefreshChatsList({required this.chatsList});
 }
