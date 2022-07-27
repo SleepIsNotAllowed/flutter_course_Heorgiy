@@ -20,7 +20,17 @@ class FirestoreClient {
     });
   }
 
-  Stream availableUsersStream() {
+  Future<void> updateUserPresence() async {
+    String currentUserId = authClient.currentUser!.uid;
+    await firestore
+        .collection('usersList')
+        .doc(currentUserId)
+        .set(<String, dynamic>{
+      'timestamp': DateTime.now().millisecondsSinceEpoch,
+    }, SetOptions(merge: true));
+  }
+
+  Stream availablePartakersStream() {
     String userId = authClient.currentUser!.uid;
     return firestore
         .collection('usersList')
@@ -50,7 +60,11 @@ class FirestoreClient {
         .snapshots();
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> fetchInitialBatchOfMessages(
+  Stream partakerPresenceStream(String partakerId) {
+    return firestore.collection('usersList').doc(partakerId).snapshots();
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> initialFetchOfOldMessages(
       String chatName) async {
     return firestore
         .collection('chatsInfo')
@@ -62,13 +76,13 @@ class FirestoreClient {
   }
 
   Future<QuerySnapshot<Map<String, dynamic>>> fetchOldMessagesBatch(
-      String chatName, int timestamp) async {
+      String chatName, int cursor) async {
     return firestore
         .collection('chatsInfo')
         .doc(chatName)
         .collection('messages')
-        .where('timestamp', isLessThan: timestamp)
         .orderBy('timestamp', descending: true)
+        .startAfter([cursor])
         .limit(queryItemsNumber)
         .get();
   }
@@ -86,21 +100,24 @@ class FirestoreClient {
   Future<void> sendMessage(
       String text, String userId, int timestamp, String chatName) async {
     try {
-      await firestore
-          .collection('chatsInfo')
-          .doc(chatName)
-          .set(<String, dynamic>{
-        'lastMessage': text,
-        'timestamp': timestamp,
-      }, SetOptions(merge: true));
-      await firestore
-          .collection('chatsInfo')
-          .doc(chatName)
-          .collection('messages')
-          .add(<String, dynamic>{
-        'text': text,
-        'userId': userId,
-        'timestamp': timestamp,
+      await firestore.runTransaction((transaction) async {
+        firestore
+            .collection('chatsInfo')
+            .doc(chatName)
+            .set(<String, dynamic>{
+          'lastMessage': text,
+          'timestamp': timestamp,
+        }, SetOptions(merge: true));
+        firestore
+            .collection('chatsInfo')
+            .doc(chatName)
+            .collection('messages')
+            .add(<String, dynamic>{
+          'text': text,
+          'userId': userId,
+          'timestamp': timestamp,
+          'isRead': false,
+        });
       });
     } on Exception catch (exception) {
       print(exception.toString());

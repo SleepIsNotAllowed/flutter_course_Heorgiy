@@ -34,12 +34,8 @@ class UsersAndChatsPage extends StatelessWidget {
             },
             builder: (context, state) {
               return state.navigationIndex == 0
-                  ? UsersListView(
-                      bloc: context.read<UsersAndChatsBloc>(),
-                    )
-                  : ChatsListView(
-                      bloc: context.read<UsersAndChatsBloc>(),
-                    );
+                  ? const UsersListView()
+                  : const ChatsListView();
             },
           ),
           bottomNavigationBar: const BottomBar(),

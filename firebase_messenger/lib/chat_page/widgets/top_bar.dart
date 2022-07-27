@@ -42,10 +42,27 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
         _buildParticipantIcon(userInfo),
       ],
       centerTitle: true,
-      title: Text(
-        userInfo.name,
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Colors.black54),
+      title: BlocBuilder<ChatBloc, ChatState>(
+        builder: (context, state) {
+          return Column(
+            children: [
+              Text(
+                userInfo.name,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.black),
+              ),
+              Text(
+                _choosePartakerStatus(state),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -61,6 +78,19 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
     );
+  }
+
+  String _choosePartakerStatus(ChatState state) {
+    if (state.partakerLastSeen == null) {
+      return 'connecting...';
+    } else {
+      bool isOffline = DateTime.now()
+              .difference(
+                  DateTime.fromMillisecondsSinceEpoch(state.partakerLastSeen!))
+              .inMinutes >
+          3;
+      return isOffline ? 'offline' : 'online';
+    }
   }
 
   @override

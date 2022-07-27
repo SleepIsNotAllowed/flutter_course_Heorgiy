@@ -5,30 +5,34 @@ class ChatState {
   final bool isSendButtonEnabled;
   final List<MessageInfo> oldMessages;
   final List<MessageInfo> newMessages;
-  final int? lastMessageStamp;
+  final int? queryCursorToOld;
   final ReadMessagesState readMessages;
+  final int? partakerLastSeen;
 
   const ChatState({
     this.isSendButtonEnabled = false,
     required this.oldMessages,
     required this.newMessages,
-    this.lastMessageStamp,
+    this.queryCursorToOld,
     this.readMessages = ReadMessagesState.initial,
+    this.partakerLastSeen,
   });
 
   ChatState copyWith({
     bool? isSendButtonEnabled,
     List<MessageInfo>? oldMessages,
     List<MessageInfo>? newMessages,
-    int? lastMessageStamp,
+    int? queryCursorToOld,
     ReadMessagesState? readMessages,
+    int? partakerLastSeen,
   }) {
     return ChatState(
       isSendButtonEnabled: isSendButtonEnabled ?? this.isSendButtonEnabled,
       oldMessages: oldMessages ?? this.oldMessages,
       newMessages: newMessages ?? this.newMessages,
-      lastMessageStamp: lastMessageStamp ?? this.lastMessageStamp,
+      queryCursorToOld: queryCursorToOld ?? this.queryCursorToOld,
       readMessages: readMessages ?? this.readMessages,
+      partakerLastSeen: partakerLastSeen ?? this.partakerLastSeen,
     );
   }
 }

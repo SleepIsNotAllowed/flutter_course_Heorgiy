@@ -5,12 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatsListView extends StatelessWidget {
-  final UsersAndChatsBloc bloc;
-
-  const ChatsListView({
-    Key? key,
-    required this.bloc,
-  }) : super(key: key);
+  const ChatsListView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +52,8 @@ class ChatsListView extends StatelessWidget {
           break;
         }
       }
+      bool isOffline =
+          DateTime.now().difference(partakerInfo.lastUpdated).inMinutes > 3;
 
       chatTiles.add(
         GestureDetector(
@@ -77,19 +74,47 @@ class ChatsListView extends StatelessWidget {
               tileColor: Colors.grey.shade200,
               title: Text(
                 partakerInfo.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 19,
                 ),
               ),
               subtitle: Text(
                 chatInfo.lastMessage,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              leading: CircleAvatar(
-                radius: 24,
-                backgroundColor: partakerInfo.thumbnailColor,
-                child: Text(
-                  partakerInfo.name[0].toUpperCase(),
-                  style: const TextStyle(color: Colors.white, fontSize: 24),
+              leading: SizedBox(
+                height: 48,
+                width: 50,
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundColor: partakerInfo.thumbnailColor,
+                      child: Text(
+                        partakerInfo.name[0].toUpperCase(),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 24),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: CircleAvatar(
+                        radius: 8,
+                        backgroundColor: isOffline
+                            ? Colors.transparent
+                            : Colors.grey.shade200,
+                        child: CircleAvatar(
+                          radius: 6,
+                          backgroundColor: isOffline
+                              ? Colors.transparent
+                              : Colors.greenAccent.shade400,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),

@@ -37,16 +37,7 @@ class _ChatScaffoldState extends State<ChatScaffold> {
           Expanded(
             child: MessagesView(partakerName: widget.partakerInfo.name),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-            ),
-            child: const ChatBottomBar(),
-          ),
+          const ChatBottomBar(),
         ],
       ),
     );

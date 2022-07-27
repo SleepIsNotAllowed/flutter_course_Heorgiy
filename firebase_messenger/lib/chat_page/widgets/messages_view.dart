@@ -2,6 +2,7 @@ import 'package:firebase_messenger/chat_page/chat_bloc.dart';
 import 'package:firebase_messenger/data_models/message_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class MessagesView extends StatelessWidget {
   final String partakerName;
@@ -38,9 +39,10 @@ class MessagesView extends StatelessWidget {
           int newMessagesLength = state.newMessages.length;
           int oldMessagesLength = state.oldMessages.length;
           int loadThreshold = newMessagesLength + oldMessagesLength - 10;
-          return ListView.builder(
+          return ScrollablePositionedList.builder(
             padding: const EdgeInsets.all(8),
             reverse: true,
+            itemScrollController: context.read<ChatBloc>().itemScrollController,
             itemCount: newMessagesLength + oldMessagesLength,
             itemBuilder: (BuildContext context, int index) {
               if (index == loadThreshold &&

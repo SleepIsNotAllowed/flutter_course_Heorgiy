@@ -11,23 +11,16 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(),
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        routes: {
-          'auth': (context) => const AuthPage(),
-          'usersAndChats': (context) => const UsersAndChatsPage(),
-          'chat': (context) => const ChatPage(),
-        },
-        initialRoute: FirebaseAuthClient().auth.currentUser == null
-            ? 'auth'
-            : 'usersAndChats',
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      routes: {
+        'auth': (context) => const AuthPage(),
+        'usersAndChats': (context) => const UsersAndChatsPage(),
+        'chat': (context) => const ChatPage(),
+      },
+      initialRoute: FirebaseAuthClient().auth.currentUser == null
+          ? 'auth'
+          : 'usersAndChats',
     );
   }
 }

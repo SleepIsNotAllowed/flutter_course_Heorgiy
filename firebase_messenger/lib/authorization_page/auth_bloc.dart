@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:firebase_messenger/networking/firebase_auth_client.dart';
+import 'package:firebase_messenger/networking/firestore_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -10,6 +12,7 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final FirebaseAuthClient authClient = FirebaseAuthClient();
+  final FirestoreClient firestore = FirestoreClient();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -23,11 +26,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         passwordErrorMessage: null,
         authStatus: AuthStatus.loading,
       ));
+
       String? result = await authClient.signInWithEmailAndPassword(
         emailController.text,
         passwordController.text,
       );
+
       if (result == null) {
+        clearTextFields();
         emit(state.copyWith(authStatus: AuthStatus.authorized));
       } else if (result == 'Wrong password') {
         emit(state.copyWith(
@@ -51,12 +57,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         passwordErrorMessage: null,
         authStatus: AuthStatus.loading,
       ));
+
       String? result = await authClient.signUpWithEmailAndPassword(
         emailController.text,
         passwordController.text,
         nameController.text,
         Random().nextInt(Colors.primaries.length),
       );
+
       if (result == null) {
         emit(state.copyWith(authStatus: AuthStatus.signIn));
       } else if (result == 'Email already registered') {
@@ -76,9 +84,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<SignInOrSighUpToggle>((event, emit) {
-      emailController.clear();
-      passwordController.clear();
-      nameController.clear();
+      clearTextFields();
       if (state.authStatus != AuthStatus.signUp) {
         emit(state.copyWith(
           emailErrorMessage: null,
@@ -93,5 +99,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         ));
       }
     });
+  }
+
+  void clearTextFields() {
+    emailController.clear();
+    passwordController.clear();
+    nameController.clear();
   }
 }

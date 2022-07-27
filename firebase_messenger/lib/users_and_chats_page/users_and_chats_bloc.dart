@@ -12,12 +12,12 @@ part 'users_and_chats_event.dart';
 part 'users_and_chats_state.dart';
 
 class UsersAndChatsBloc extends Bloc<UsersAndChatsEvent, UsersAndChatsState> {
-  FirebaseAuthClient authClient = FirebaseAuthClient();
-  FirestoreClient firestoreClient = FirestoreClient();
+  final FirebaseAuthClient authClient = FirebaseAuthClient();
+  final FirestoreClient firestore = FirestoreClient();
 
   UsersAndChatsBloc() : super(const UsersAndChatsState(navigationIndex: 0)) {
     StreamSubscription usersChanges =
-        firestoreClient.availableUsersStream().listen((snapshot) async {
+        firestore.availablePartakersStream().listen((snapshot) async {
       List<UserContactInfo> usersList = [];
       for (final document in snapshot.docs) {
         Map<String, dynamic> userInfo = document.data();
@@ -26,8 +26,13 @@ class UsersAndChatsBloc extends Bloc<UsersAndChatsEvent, UsersAndChatsState> {
       add(RefreshUsersList(usersList: usersList));
     });
 
+    StreamSubscription usersPresence =
+        Stream.periodic(const Duration(minutes: 3), (timer) async {
+      await firestore.updateUserPresence();
+    }).listen((event) {});
+
     StreamSubscription chatsChanges =
-        firestoreClient.availableChatsStream().listen((snapshot) async {
+        firestore.availableChatsStream().listen((snapshot) async {
       List<ChatInfo> chatsList = [];
       for (final document in snapshot.docs) {
         Map<String, dynamic> chatInfo = document.data();
@@ -36,20 +41,20 @@ class UsersAndChatsBloc extends Bloc<UsersAndChatsEvent, UsersAndChatsState> {
       add(RefreshChatsList(chatsList: chatsList));
     });
 
-    on<NavigationChanged>((event, emit) {
-      emit(state.copyWith(navigationIndex: event.index));
+    on<InitializeBloc>((event, emit) {
+      firestore.updateUserPresence();
+      emit(state.copyWith(
+        currentUserId: authClient.auth.currentUser?.uid,
+      ));
     });
 
-    on<UserSignOut>((event, emit) async {
-      chatsChanges.cancel();
-      usersChanges.cancel();
-      await authClient.signOut();
+    on<NavigationChanged>((event, emit) {
+      emit(state.copyWith(navigationIndex: event.index));
     });
 
     on<RefreshUsersList>((event, emit) {
       emit(state.copyWith(
         usersList: event.usersList,
-        currentUserId: authClient.auth.currentUser?.uid,
       ));
     });
 
@@ -58,5 +63,23 @@ class UsersAndChatsBloc extends Bloc<UsersAndChatsEvent, UsersAndChatsState> {
         chatsList: event.chatsList,
       ));
     });
+
+    on<UserSignOut>((event, emit) async {
+      chatsChanges.cancel();
+      usersChanges.cancel();
+      usersPresence.cancel();
+      await authClient.signOut();
+    });
+  }
+
+  String createChatName(String userId, String partakerId) {
+    for (int i = 0; i < userId.length; i++) {
+      if (userId.codeUnitAt(i) > partakerId.codeUnitAt(i)) {
+        return '$userId${partakerId}chat';
+      } else if (userId.codeUnitAt(i) < partakerId.codeUnitAt(i)) {
+        return '$partakerId${userId}chat';
+      }
+    }
+    return '$partakerId${userId}chat';
   }
 }

@@ -3,13 +3,13 @@ part of 'users_and_chats_bloc.dart';
 @immutable
 abstract class UsersAndChatsEvent {}
 
+class InitializeBloc extends UsersAndChatsEvent {}
+
 class NavigationChanged extends UsersAndChatsEvent {
   final int index;
 
   NavigationChanged({required this.index});
 }
-
-class UserSignOut extends UsersAndChatsEvent {}
 
 class RefreshUsersList extends UsersAndChatsEvent {
   final List<UserContactInfo> usersList;
@@ -22,3 +22,5 @@ class RefreshChatsList extends UsersAndChatsEvent {
 
   RefreshChatsList({required this.chatsList});
 }
+
+class UserSignOut extends UsersAndChatsEvent {}
