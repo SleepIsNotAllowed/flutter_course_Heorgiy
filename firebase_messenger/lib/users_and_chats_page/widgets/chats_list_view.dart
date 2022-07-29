@@ -52,8 +52,6 @@ class ChatsListView extends StatelessWidget {
           break;
         }
       }
-      bool isOffline =
-          DateTime.now().difference(partakerInfo.lastUpdated).inMinutes > 3;
 
       chatTiles.add(
         GestureDetector(
@@ -103,12 +101,12 @@ class ChatsListView extends StatelessWidget {
                       alignment: Alignment.bottomRight,
                       child: CircleAvatar(
                         radius: 8,
-                        backgroundColor: isOffline
+                        backgroundColor: partakerInfo.isOffline
                             ? Colors.transparent
                             : Colors.grey.shade200,
                         child: CircleAvatar(
                           radius: 6,
-                          backgroundColor: isOffline
+                          backgroundColor: partakerInfo.isOffline
                               ? Colors.transparent
                               : Colors.greenAccent.shade400,
                         ),

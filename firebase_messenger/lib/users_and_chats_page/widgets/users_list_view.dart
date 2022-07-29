@@ -51,8 +51,6 @@ class _UsersListViewState extends State<UsersListView> {
     String userId = state.currentUserId!;
 
     for (UserContactInfo partakerInfo in state.usersList!) {
-      bool isOffline =
-          DateTime.now().difference(partakerInfo.lastUpdated).inMinutes > 3;
       contactTiles.add(
         GestureDetector(
           onTap: () {
@@ -85,7 +83,7 @@ class _UsersListViewState extends State<UsersListView> {
                 ),
               ),
               subtitle: Text(
-                isOffline ? 'offline' : 'online',
+                partakerInfo.isOffline ? 'offline' : 'online',
               ),
             ),
           ),

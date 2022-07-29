@@ -26,8 +26,12 @@ class UsersAndChatsBloc extends Bloc<UsersAndChatsEvent, UsersAndChatsState> {
       add(RefreshUsersList(usersList: usersList));
     });
 
-    StreamSubscription usersPresence =
+    StreamSubscription presenceUpdater =
         Stream.periodic(const Duration(minutes: 3), (timer) async {
+      for (UserContactInfo info in state.usersList!) {
+        info.isOffline = DateTime.now().difference(info.lastSeen).inMinutes > 2;
+      }
+      add(RefreshUsersPresence());
       await firestore.updateUserPresence();
     }).listen((event) {});
 
@@ -64,10 +68,14 @@ class UsersAndChatsBloc extends Bloc<UsersAndChatsEvent, UsersAndChatsState> {
       ));
     });
 
+    on<RefreshUsersPresence>((event, emit) {
+      emit(state.copyWith());
+    });
+
     on<UserSignOut>((event, emit) async {
       chatsChanges.cancel();
       usersChanges.cancel();
-      usersPresence.cancel();
+      presenceUpdater.cancel();
       await authClient.signOut();
     });
   }

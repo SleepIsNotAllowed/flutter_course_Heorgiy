@@ -43,6 +43,10 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
       ],
       centerTitle: true,
       title: BlocBuilder<ChatBloc, ChatState>(
+        buildWhen: (oldState, newState) {
+          return oldState.partakerLastSeen != newState.partakerLastSeen ||
+              oldState.partakerOffline != newState.partakerOffline;
+        },
         builder: (context, state) {
           return Column(
             children: [
@@ -81,15 +85,10 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   String _choosePartakerStatus(ChatState state) {
-    if (state.partakerLastSeen == null) {
+    if (state.partakerOffline == null) {
       return 'connecting...';
     } else {
-      bool isOffline = DateTime.now()
-              .difference(
-                  DateTime.fromMillisecondsSinceEpoch(state.partakerLastSeen!))
-              .inMinutes >
-          3;
-      return isOffline ? 'offline' : 'online';
+      return state.partakerOffline! ? 'offline' : 'online';
     }
   }
 

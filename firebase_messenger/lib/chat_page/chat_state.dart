@@ -8,6 +8,7 @@ class ChatState {
   final int? queryCursorToOld;
   final ReadMessagesState readMessages;
   final int? partakerLastSeen;
+  final bool? partakerOffline;
 
   const ChatState({
     this.isSendButtonEnabled = false,
@@ -16,6 +17,7 @@ class ChatState {
     this.queryCursorToOld,
     this.readMessages = ReadMessagesState.initial,
     this.partakerLastSeen,
+    this.partakerOffline = true,
   });
 
   ChatState copyWith({
@@ -25,6 +27,7 @@ class ChatState {
     int? queryCursorToOld,
     ReadMessagesState? readMessages,
     int? partakerLastSeen,
+    bool? partakerOffline,
   }) {
     return ChatState(
       isSendButtonEnabled: isSendButtonEnabled ?? this.isSendButtonEnabled,
@@ -33,6 +36,7 @@ class ChatState {
       queryCursorToOld: queryCursorToOld ?? this.queryCursorToOld,
       readMessages: readMessages ?? this.readMessages,
       partakerLastSeen: partakerLastSeen ?? this.partakerLastSeen,
+      partakerOffline: partakerOffline ?? this.partakerOffline,
     );
   }
 }

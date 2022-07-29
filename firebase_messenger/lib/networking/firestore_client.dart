@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messenger/networking/firebase_auth_client.dart';
 
 class FirestoreClient {
-  final int queryItemsNumber = 30; // number of items fetched by queries
+  final int queryItemsNumber = 20; // number of items fetched by queries
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth authClient = FirebaseAuthClient().auth;
 
@@ -87,24 +87,38 @@ class FirestoreClient {
         .get();
   }
 
-  Future<void> createChatReferences(String partakerId, String chatName) async {
-    String userId = authClient.currentUser!.uid;
-    await firestore.collection('chatsInfo').doc(chatName).set(
-      <String, dynamic>{
-        'partakers': [userId, partakerId],
-        'chatName': chatName,
-      },
-    );
-  }
-
-  Future<void> sendMessage(
-      String text, String userId, int timestamp, String chatName) async {
+  Future<void> createChatAndSendMessage(
+      String text, String partakerId, int timestamp, String chatName) async {
     try {
+      String userId = authClient.currentUser!.uid;
       await firestore.runTransaction((transaction) async {
+        firestore.collection('chatsInfo').doc(chatName).set(<String, dynamic>{
+          'partakers': [userId, partakerId],
+          'chatName': chatName,
+          'lastMessage': text,
+          'timestamp': timestamp,
+        });
         firestore
             .collection('chatsInfo')
             .doc(chatName)
-            .set(<String, dynamic>{
+            .collection('messages')
+            .add(<String, dynamic>{
+          'text': text,
+          'userId': userId,
+          'timestamp': timestamp,
+          'isRead': false,
+        });
+      });
+    } on Exception catch (exception) {
+      print(exception.toString());
+    }
+  }
+
+  Future<void> sendMessage(String text, int timestamp, String chatName) async {
+    try {
+      String userId = authClient.currentUser!.uid;
+      await firestore.runTransaction((transaction) async {
+        firestore.collection('chatsInfo').doc(chatName).set(<String, dynamic>{
           'lastMessage': text,
           'timestamp': timestamp,
         }, SetOptions(merge: true));

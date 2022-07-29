@@ -25,28 +25,47 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     StreamSubscription newMessages = firestore
         .newMessagesStream(chatName, DateTime.now().millisecondsSinceEpoch)
         .listen((snapshot) async {
-      List<MessageInfo> newMessages = [];
-      for (final document in snapshot.docs) {
-        Map<String, dynamic> storeMessage = document.data();
-        newMessages.add(MessageInfo.fromDoc(storeMessage, document.id));
+      if (snapshot.docs.length > 0) {
+        List<MessageInfo> newMessages = [];
+        newMessages.add(MessageInfo.fromDoc(
+          snapshot.docs.last.data(),
+          snapshot.docs.last.id,
+        ));
         add(UpdateWithNewMessages(
           messages: newMessages..addAll(state.newMessages),
         ));
       }
     });
 
-    StreamSubscription usersPresence =
+    StreamSubscription presenceUpdater =
         Stream.periodic(const Duration(minutes: 3), (timer) async {
+      DateTime partakerLastSeen =
+          DateTime.fromMillisecondsSinceEpoch(state.partakerLastSeen!);
+      if (DateTime.now().difference(partakerLastSeen).inMinutes > 2) {
+        add(UpdatePartakerPresence(
+          lastSeen: state.partakerLastSeen!,
+          isOffline: true,
+        ));
+      }
       await firestore.updateUserPresence();
     }).listen((event) {});
 
     StreamSubscription partakerPresence =
         firestore.partakerPresenceStream(partakerId).listen((snapshot) {
-      add(UpdatePartakerPresence(lastSeen: snapshot.data()['timestamp']));
+      DateTime lastSeen =
+          DateTime.fromMillisecondsSinceEpoch(snapshot.data()['timestamp']);
+      bool isOffline = DateTime.now().difference(lastSeen).inMinutes > 3;
+      add(UpdatePartakerPresence(
+        lastSeen: snapshot.data()['timestamp'],
+        isOffline: isOffline,
+      ));
     });
 
-    on<UpdatePartakerPresence>((event, emit){
-      emit(state.copyWith(partakerLastSeen: event.lastSeen));
+    on<UpdatePartakerPresence>((event, emit) {
+      emit(state.copyWith(
+        partakerLastSeen: event.lastSeen,
+        partakerOffline: event.isOffline,
+      ));
     });
 
     on<InitialLoad>((event, emit) async {
@@ -105,17 +124,19 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       messageController.clear();
       emit(state.copyWith(isSendButtonEnabled: false));
       if (state.oldMessages.isEmpty) {
-        await firestore.createChatReferences(
+        await firestore.createChatAndSendMessage(
+          text,
           partakerId,
+          DateTime.now().millisecondsSinceEpoch,
+          chatName,
+        );
+      } else {
+        await firestore.sendMessage(
+          text,
+          DateTime.now().millisecondsSinceEpoch,
           chatName,
         );
       }
-      await firestore.sendMessage(
-        text,
-        authClient.auth.currentUser!.uid,
-        DateTime.now().millisecondsSinceEpoch,
-        chatName,
-      );
     });
 
     on<UpdateWithNewMessages>((event, emit) {
@@ -124,7 +145,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
     on<LeaveChat>((event, emit) {
       newMessages.cancel();
-      usersPresence.cancel();
+      presenceUpdater.cancel();
       partakerPresence.cancel();
     });
   }

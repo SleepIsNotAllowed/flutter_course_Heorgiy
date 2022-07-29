@@ -23,4 +23,6 @@ class RefreshChatsList extends UsersAndChatsEvent {
   RefreshChatsList({required this.chatsList});
 }
 
+class RefreshUsersPresence extends UsersAndChatsEvent{}
+
 class UserSignOut extends UsersAndChatsEvent {}

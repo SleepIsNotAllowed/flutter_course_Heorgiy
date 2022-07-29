@@ -5,10 +5,11 @@ abstract class ChatEvent {}
 
 class InitialLoad extends ChatEvent {}
 
-class UpdatePartakerPresence extends ChatEvent{
+class UpdatePartakerPresence extends ChatEvent {
   final int lastSeen;
+  final bool isOffline;
 
-  UpdatePartakerPresence({required this.lastSeen});
+  UpdatePartakerPresence({required this.lastSeen, required this.isOffline});
 }
 
 class UpdateWithNewMessages extends ChatEvent {
