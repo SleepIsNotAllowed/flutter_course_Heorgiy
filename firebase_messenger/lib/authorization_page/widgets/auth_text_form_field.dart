@@ -3,31 +3,31 @@ import 'package:flutter/material.dart';
 class AuthTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final TextInputAction inputAction;
+  final void Function() action;
   final bool obscureText;
   final String labelText;
   final IconData icon;
-  final String? Function(String?) validator;
   final String? errorMessage;
 
   const AuthTextFormField({
     Key? key,
     this.controller,
     required this.inputAction,
+    required this.action,
     required this.obscureText,
     required this.labelText,
     required this.icon,
-    required this.validator,
     required this.errorMessage,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return TextField(
       controller: controller,
       textInputAction: inputAction,
       cursorColor: Colors.deepPurpleAccent,
+      onSubmitted: (text) => action(),
       obscureText: obscureText,
-      validator: (input) => validator(input),
       decoration: InputDecoration(
         errorText: errorMessage,
         labelText: labelText,
@@ -59,17 +59,5 @@ class AuthTextFormField extends StatelessWidget {
         prefixIconConstraints: const BoxConstraints(minWidth: 28),
       ),
     );
-  }
-
-  String? validateInput(String input) {
-    if (labelText == 'email' &&
-        !RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-            .hasMatch(input)) {
-      return 'Incorrect email';
-    } else if (labelText == 'create password' && input.length < 6) {
-      return 'Password minimum length - 6 symbols';
-    }
-
-    return null;
   }
 }

@@ -5,6 +5,21 @@ class FirebaseAuthClient {
   final FirebaseAuth auth = FirebaseAuth.instance;
   static FirestoreClient firestore = FirestoreClient();
 
+  Future<String?> validateEmail(String email, bool isSignUp) async {
+    try {
+      List authMethods = await auth.fetchSignInMethodsForEmail(email);
+      if (!isSignUp && authMethods.isEmpty) {
+        return 'No users with this email';
+      } else if (isSignUp && authMethods.contains('password')) {
+        return 'Email already registered';
+      } else {
+        return null;
+      }
+    } on Exception catch (_) {
+      return 'No Internet connection';
+    }
+  }
+
   Future<String?> signInWithEmailAndPassword(
     String email,
     String password,

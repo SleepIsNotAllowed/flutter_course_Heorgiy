@@ -10,35 +10,35 @@ class AuthPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<AuthBloc>(
       create: (context) => AuthBloc(),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.purple.shade800,
-              Colors.deepPurple,
-              Colors.blue.shade800,
-            ],
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state.authStatus == AuthStatus.authorized) {
+            Navigator.pushReplacementNamed(
+              context,
+              'usersAndChats',
+            );
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.purple.shade800,
+                Colors.deepPurple,
+                Colors.blue.shade800,
+              ],
+            ),
           ),
-        ),
-        child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: SingleChildScrollView(
-            physics: const ClampingScrollPhysics(),
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: Center(
-                child: BlocListener<AuthBloc, AuthState>(
-                  listener: (context, state) {
-                    if (state.authStatus == AuthStatus.authorized) {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        'usersAndChats',
-                      );
-                    }
-                  },
-                  child: const AuthWindow(),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height,
+                child: const Center(
+                  child: AuthWindow(),
                 ),
               ),
             ),
